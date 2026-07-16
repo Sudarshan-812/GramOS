@@ -16,6 +16,8 @@ import {
   TrendingUp,
   Wallet,
 } from "lucide-react";
+import Image from "next/image";
+import RiskChart from "@/components/RiskChart";
 import { assessRisk, getMockProfile, listMockProfileKeys } from "@/lib/api";
 import type {
   RiskAssessmentRequest,
@@ -152,11 +154,16 @@ export default function RiskDashboard() {
     <div className="flex min-h-screen bg-slate-50">
       {/* Sidebar */}
       <aside className="flex w-72 shrink-0 flex-col border-r border-slate-200 bg-white">
-        <div className="border-b border-slate-200 px-5 py-5">
-          <span className="text-lg font-semibold tracking-tight text-slate-900">
-            GramOS
-          </span>
-          <p className="mt-0.5 text-xs text-slate-500">Risk Portfolio</p>
+        <div className="border-b border-slate-200 px-5 py-4">
+          <Image
+            src="/gramos-logo.png"
+            alt="GramOS"
+            width={1051}
+            height={907}
+            className="w-32 h-auto"
+            priority
+          />
+          <p className="mt-1 text-xs text-slate-500">Risk Portfolio</p>
         </div>
 
         <div className="flex-1 overflow-y-auto p-3">
@@ -348,6 +355,11 @@ export default function RiskDashboard() {
             {assessment && !assessing && (
               <>
                 <RiskScoreWidget assessment={assessment} />
+
+                <RiskChart
+                  financials={selected.profile.financials}
+                  climate={selected.profile.climate}
+                />
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <SummaryCard

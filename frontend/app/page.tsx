@@ -9,6 +9,7 @@ import {
   Landmark,
   CheckCircle2,
 } from "lucide-react";
+import Image from "next/image";
 
 const features = [
   {
@@ -51,14 +52,14 @@ export default function Home() {
       {/* Nav */}
       <header className="sticky top-0 z-50 border-b border-slate-200 bg-slate-50/80 backdrop-blur">
         <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-900">
-              <span className="text-sm font-bold text-emerald-500">G</span>
-            </div>
-            <span className="text-lg font-semibold tracking-tight text-slate-900">
-              GramOS
-            </span>
-          </div>
+          <Image
+            src="/gramos-logo.png"
+            alt="GramOS"
+            width={1051}
+            height={907}
+            className="h-14 w-auto"
+            priority
+          />
           <div className="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex">
             <a href="#architecture" className="transition hover:text-slate-900">
               Architecture
