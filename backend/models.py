@@ -78,3 +78,13 @@ class ClimateSnapshot(BaseModel):
     recorded_at: datetime | None = Field(
         default=None, description="Day this snapshot represents; null for the original Phase 1 seed row"
     )
+
+
+class HistoryPoint(BaseModel):
+    """One day of GET /api/enterprises/{id}/history — a financial_ledgers row joined with its
+    same-day climate_snapshots row, reduced to just the fields the dashboard's time-series
+    chart plots."""
+
+    recorded_at: datetime
+    monthly_revenue_inr: float
+    ndvi_index: float

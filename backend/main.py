@@ -13,7 +13,15 @@ from langchain_google_genai.chat_models import ChatGoogleGenerativeAIError
 
 from database import get_supabase_client
 from engine import get_golden_fallback, risk_graph
-from models import ClimateProfile, FinancialProfile, RiskAssessmentRequest, RiskAssessmentResponse
+from models import (
+    ClimateProfile,
+    FinancialProfile,
+    HistoryPoint,
+    RiskAssessmentRequest,
+    RiskAssessmentResponse,
+)
+
+HISTORY_DAYS = 30
 
 logger = logging.getLogger("gramos")
 
@@ -100,6 +108,46 @@ def get_mock_profile(profile_key: str):
             alpha_earth_embeddings=_synthetic_alpha_earth_embeddings(profile_key),
         ),
     )
+
+
+@app.get("/api/enterprises/{enterprise_id}/history", response_model=list[HistoryPoint])
+def get_enterprise_history(enterprise_id: str):
+    client = get_supabase_client()
+
+    ledger_rows = (
+        client.table("financial_ledgers")
+        .select("recorded_at, monthly_revenue_inr")
+        .eq("enterprise_id", enterprise_id)
+        .order("recorded_at", desc=True, nullsfirst=False)
+        .limit(HISTORY_DAYS)
+        .execute()
+        .data
+    )
+    climate_rows = (
+        client.table("climate_snapshots")
+        .select("recorded_at, ndvi_index")
+        .eq("enterprise_id", enterprise_id)
+        .order("recorded_at", desc=True, nullsfirst=False)
+        .limit(HISTORY_DAYS)
+        .execute()
+        .data
+    )
+
+    # financial_ledgers and climate_snapshots are upserted together per (enterprise_id,
+    # recorded_at) by seed_dynamic_data.py, so the same recorded_at value joins both tables.
+    ndvi_by_date = {row["recorded_at"]: row["ndvi_index"] for row in climate_rows if row["recorded_at"]}
+
+    points = [
+        HistoryPoint(
+            recorded_at=row["recorded_at"],
+            monthly_revenue_inr=row["monthly_revenue_inr"],
+            ndvi_index=ndvi_by_date[row["recorded_at"]],
+        )
+        for row in ledger_rows
+        if row["recorded_at"] in ndvi_by_date
+    ]
+    points.sort(key=lambda p: p.recorded_at)
+    return points
 
 
 @app.post("/api/assess-risk", response_model=RiskAssessmentResponse)

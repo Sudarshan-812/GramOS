@@ -30,3 +30,9 @@ export interface RiskAssessmentResponse {
   actionable_mitigation_steps: string[];
   is_cached_fallback: boolean;
 }
+
+export interface HistoryPoint {
+  recorded_at: string;
+  monthly_revenue_inr: number;
+  ndvi_index: number;
+}

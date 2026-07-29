@@ -17,10 +17,15 @@ import {
   Wallet,
   WifiOff,
 } from "lucide-react";
-import Image from "next/image";
 import RiskChart from "@/components/RiskChart";
-import { assessRisk, getMockProfile, listMockProfileKeys } from "@/lib/api";
+import {
+  assessRisk,
+  getEnterpriseHistory,
+  getMockProfile,
+  listMockProfileKeys,
+} from "@/lib/api";
 import type {
+  HistoryPoint,
   RiskAssessmentRequest,
   RiskAssessmentResponse,
   RiskClassification,
@@ -29,6 +34,7 @@ import type {
 interface EnterpriseProfile {
   key: string;
   profile: RiskAssessmentRequest;
+  history: HistoryPoint[];
 }
 
 const RISK_STYLES: Record<
@@ -90,7 +96,13 @@ export default function RiskDashboard() {
       try {
         const keys = await listMockProfileKeys();
         const loaded = await Promise.all(
-          keys.map(async (key) => ({ key, profile: await getMockProfile(key) }))
+          keys.map(async (key) => {
+            const [profile, history] = await Promise.all([
+              getMockProfile(key),
+              getEnterpriseHistory(key),
+            ]);
+            return { key, profile, history };
+          })
         );
         if (cancelled) return;
         setProfiles(loaded);
@@ -156,14 +168,9 @@ export default function RiskDashboard() {
       {/* Sidebar */}
       <aside className="flex w-72 shrink-0 flex-col border-r border-slate-200 bg-white">
         <div className="border-b border-slate-200 px-5 py-4">
-          <Image
-            src="/gramos-logo.png"
-            alt="GramOS"
-            width={1051}
-            height={907}
-            className="w-32 h-auto"
-            priority
-          />
+          <h1 className="text-xl font-semibold tracking-tight text-slate-900">
+            GramOS
+          </h1>
           <p className="mt-1 text-xs text-slate-500">Risk Portfolio</p>
         </div>
 
@@ -365,6 +372,7 @@ export default function RiskDashboard() {
                 <RiskChart
                   financials={selected.profile.financials}
                   climate={selected.profile.climate}
+                  historyData={selected.history}
                 />
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">

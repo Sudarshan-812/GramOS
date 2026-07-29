@@ -1,4 +1,4 @@
-import type { RiskAssessmentRequest, RiskAssessmentResponse } from "./types";
+import type { HistoryPoint, RiskAssessmentRequest, RiskAssessmentResponse } from "./types";
 
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
@@ -24,6 +24,16 @@ export async function getMockProfile(
   key: string
 ): Promise<RiskAssessmentRequest> {
   const res = await fetch(`${API_BASE_URL}/api/mock-profiles/${key}`);
+  if (!res.ok) throw new Error(await parseErrorDetail(res));
+  return res.json();
+}
+
+export async function getEnterpriseHistory(
+  enterpriseId: string
+): Promise<HistoryPoint[]> {
+  const res = await fetch(
+    `${API_BASE_URL}/api/enterprises/${enterpriseId}/history`
+  );
   if (!res.ok) throw new Error(await parseErrorDetail(res));
   return res.json();
 }
