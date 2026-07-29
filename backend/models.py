@@ -35,3 +35,6 @@ class RiskAssessmentResponse(BaseModel):
     financial_health_summary: str
     climate_risk_impact: str
     actionable_mitigation_steps: list[str]
+    is_cached_fallback: bool = Field(
+        default=False, description="True when this response was served from the golden fallback cache"
+    )

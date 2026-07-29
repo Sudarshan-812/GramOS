@@ -1,13 +1,22 @@
+import asyncio
+import logging
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from google.genai import errors as genai_errors
+from langchain_google_genai.chat_models import ChatGoogleGenerativeAIError
 
-from engine import risk_graph
+from engine import get_golden_fallback, risk_graph
 from mock_data import MOCK_PROFILES
 from models import RiskAssessmentRequest, RiskAssessmentResponse
+
+logger = logging.getLogger("gramos")
+
+ASSESS_RISK_TIMEOUT_SECONDS = 4.5
 
 app = FastAPI(title="GramOS API", version="0.1.0")
 
@@ -41,8 +50,25 @@ def get_mock_profile(profile_key: str):
 @app.post("/api/assess-risk", response_model=RiskAssessmentResponse)
 async def assess_risk(request: RiskAssessmentRequest):
     try:
-        result = await risk_graph.ainvoke({"request": request})
+        result = await asyncio.wait_for(
+            risk_graph.ainvoke({"request": request}),
+            timeout=ASSESS_RISK_TIMEOUT_SECONDS,
+        )
         return result["final_assessment"]
+    except asyncio.TimeoutError:
+        logger.warning(
+            "assess-risk timed out after %.1fs for '%s' — serving golden fallback",
+            ASSESS_RISK_TIMEOUT_SECONDS,
+            request.enterprise_name,
+        )
+        return get_golden_fallback(request.enterprise_name)
+    except (genai_errors.ClientError, genai_errors.ServerError, ChatGoogleGenerativeAIError) as exc:
+        logger.warning(
+            "assess-risk hit a Gemini API error (%s) for '%s' — serving golden fallback",
+            exc,
+            request.enterprise_name,
+        )
+        return get_golden_fallback(request.enterprise_name)
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:

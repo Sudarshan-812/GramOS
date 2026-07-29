@@ -28,4 +28,5 @@ export interface RiskAssessmentResponse {
   financial_health_summary: string;
   climate_risk_impact: string;
   actionable_mitigation_steps: string[];
+  is_cached_fallback: boolean;
 }

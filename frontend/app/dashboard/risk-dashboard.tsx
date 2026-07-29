@@ -15,6 +15,7 @@ import {
   Sprout,
   TrendingUp,
   Wallet,
+  WifiOff,
 } from "lucide-react";
 import Image from "next/image";
 import RiskChart from "@/components/RiskChart";
@@ -477,36 +478,44 @@ function RiskScoreWidget({
 
   return (
     <div className="flex flex-col items-center gap-6 rounded-2xl border border-slate-200 bg-white p-8 sm:flex-row sm:items-start sm:justify-between">
-      <div className="relative h-36 w-36 shrink-0">
-        <svg viewBox="0 0 120 120" className="h-36 w-36 -rotate-90">
-          <circle
-            cx="60"
-            cy="60"
-            r={radius}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="10"
-            className="text-slate-100"
-          />
-          <circle
-            cx="60"
-            cy="60"
-            r={radius}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="10"
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
-            className={`${styles.ring} transition-[stroke-dashoffset] duration-700 ease-out`}
-          />
-        </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-3xl font-bold text-slate-900">
-            {assessment.risk_score}
-          </span>
-          <span className="text-xs text-slate-400">/ 100</span>
+      <div className="flex flex-col items-center gap-2">
+        <div className="relative h-36 w-36 shrink-0">
+          <svg viewBox="0 0 120 120" className="h-36 w-36 -rotate-90">
+            <circle
+              cx="60"
+              cy="60"
+              r={radius}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="10"
+              className="text-slate-100"
+            />
+            <circle
+              cx="60"
+              cy="60"
+              r={radius}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="10"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={offset}
+              className={`${styles.ring} transition-[stroke-dashoffset] duration-700 ease-out`}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-3xl font-bold text-slate-900">
+              {assessment.risk_score}
+            </span>
+            <span className="text-xs text-slate-400">/ 100</span>
+          </div>
         </div>
+        {assessment.is_cached_fallback && (
+          <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-400">
+            <WifiOff className="h-3 w-3" />
+            Offline / Fallback Mode
+          </span>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col gap-3 text-center sm:text-left">

@@ -150,6 +150,155 @@ Produce the full structured risk assessment now."""
     return {"final_assessment": final_assessment}
 
 
+DEMO_GOLDEN_CACHE: dict[str, RiskAssessmentResponse] = {
+    "Bhairavgad Dairy Producers' Cooperative": RiskAssessmentResponse(
+        risk_score=19,
+        risk_classification="LOW",
+        financial_health_summary=(
+            "Bhairavgad Dairy Producers' Cooperative exhibits strong financial discipline, with "
+            "zero days past due on current obligations. The cooperative maintains consistent "
+            "operational activity, reflected in a monthly revenue of INR 185,000 and a high volume "
+            "of 412 UPI transactions, demonstrating effective digital payment adoption. The 72% "
+            "utilization of its Kisan Credit Card indicates active and managed working capital use, "
+            "contributing to a generally healthy cash flow position."
+        ),
+        climate_risk_impact=(
+            "The cooperative faces a significant and escalating climate risk due to severe "
+            "environmental stress. An extremely low NDVI (0.280), critically low soil moisture "
+            "(14.5%), and a substantial rainfall deficit (-38.0%) collectively threaten the natural "
+            "resource base. This will drastically reduce natural fodder availability and quality, "
+            "and severely constrain water access for livestock. Consequently, operational costs are "
+            "projected to increase significantly due to the necessity of purchasing supplementary "
+            "feed and water, while simultaneously reducing milk yields per animal. This trend poses "
+            "a substantial threat to future cash flow, profitability, and long-term viability, "
+            "irrespective of current strong repayment performance."
+        ),
+        actionable_mitigation_steps=[
+            "Implement climate-resilient fodder management strategies, including promoting "
+            "drought-resistant fodder varieties and establishing community fodder banks or silage "
+            "units.",
+            "Invest in water conservation and harvesting technologies, such as rainwater harvesting "
+            "systems for livestock and efficient irrigation for fodder cultivation, to mitigate "
+            "water scarcity.",
+            "Develop a contingency fund to buffer against increased operational costs associated "
+            "with purchasing supplementary feed and water during periods of environmental stress.",
+            "Explore and facilitate access to livestock insurance schemes to protect against losses "
+            "from climate-induced reductions in milk yield or animal health issues.",
+            "Provide training and awareness programs on climate-smart dairy farming practices, "
+            "including efficient resource utilization and adaptive livestock management techniques.",
+        ],
+        is_cached_fallback=True,
+    ),
+    "Shivshakti Krishi Seva Kendra": RiskAssessmentResponse(
+        risk_score=4,
+        risk_classification="LOW",
+        financial_health_summary=(
+            "Shivshakti Krishi Seva Kendra demonstrates strong financial health, characterized by "
+            "excellent repayment discipline with only 2 days past due on current obligations. The "
+            "enterprise maintains robust cash flow, supported by a consistent monthly revenue of "
+            "INR 610,000 and a high volume of 980 daily UPI transactions, indicating active sales "
+            "and effective digital payment adoption. Furthermore, the low 35% utilization of its "
+            "KCC facility suggests prudent working capital management and significant available "
+            "credit headroom."
+        ),
+        climate_risk_impact=(
+            "While current climate conditions are favorable, supporting healthy crop growth and "
+            "demand for agri-inputs, Shivshakti Krishi Seva Kendra faces significant forward climate "
+            "risk. As an agri-input retailer, its revenue is directly tied to the sustained "
+            "productivity and purchasing power of local farmers. Increased frequency and intensity "
+            "of future climate events such as droughts, floods, or extreme heat would severely "
+            "impact crop yields and fodder availability, leading to reduced farmer income. This "
+            "decline in farmer prosperity would directly translate into decreased demand for seeds, "
+            "fertilizers, and pesticides, threatening the retailer's future cash flow through "
+            "reduced sales volumes, potential inventory write-offs, and increased risk of bad debt "
+            "from financially strained farmers."
+        ),
+        actionable_mitigation_steps=[
+            "Diversify product offerings to include climate-resilient inputs (e.g., drought-"
+            "resistant seeds, water-efficient irrigation systems) and non-crop-dependent products "
+            "(e.g., livestock feed, small farm machinery rentals) to buffer against crop yield "
+            "fluctuations.",
+            "Strengthen credit assessment and recovery mechanisms for farmer credit, incorporating "
+            "climate risk factors into lending decisions to mitigate potential bad debt during "
+            "adverse climate events.",
+            "Encourage and educate local farmers on climate-smart agricultural practices and "
+            "technologies to enhance their resilience, thereby stabilizing their purchasing power "
+            "and demand for inputs.",
+            "Explore partnerships with agricultural insurance providers to facilitate access to "
+            "crop insurance for local farmers, indirectly safeguarding their income and ability to "
+            "purchase inputs.",
+            "Maintain optimal inventory levels and implement robust inventory management practices "
+            "to minimize write-offs during periods of reduced demand caused by climate-induced "
+            "agricultural downturns.",
+            "Build and maintain a healthy cash reserve to provide a financial buffer against "
+            "potential revenue shortfalls during periods of severe climate impact on farmer income.",
+        ],
+        is_cached_fallback=True,
+    ),
+    "Meenakshi Handloom Traders": RiskAssessmentResponse(
+        risk_score=93,
+        risk_classification="CRITICAL",
+        financial_health_summary=(
+            "Meenakshi Handloom Traders exhibits strong revenue traceability, with the majority of "
+            "its income flowing through UPI. However, the enterprise's financial health is severely "
+            "strained, marked by a high 91% Kisan Credit Card (KCC) utilization, indicating an "
+            "over-reliance on credit for operational liquidity. Repayment discipline is a "
+            "significant concern, with the enterprise currently 41 days past due on its "
+            "obligations, reflecting a consistent inability to meet financial commitments promptly."
+        ),
+        climate_risk_impact=(
+            "The current climate profile, characterized by moderate NDVI, soil moisture, and "
+            "slightly below-average rainfall, indicates a local ecosystem under moderate stress. "
+            "For a Handicraft & Textile Trader, this directly impacts the availability and quality "
+            "of natural raw materials such as plant fibers, dyes, and wood, which are inherently "
+            "dependent on healthy vegetation and adequate water resources. This trend suggests a "
+            "lack of resilience in the local environment, posing a plausible threat to future cash "
+            "flow through potential reductions in material supply, increased input costs due to "
+            "scarcity, and a weakening of local purchasing power as the broader agricultural "
+            "economy, which supports both artisans and customers, faces ongoing environmental "
+            "pressure. Even minor deterioration in these conditions could significantly impede the "
+            "enterprise's ability to source inputs and sell products."
+        ),
+        actionable_mitigation_steps=[
+            "Implement a strict cash flow management plan, including detailed budgeting and expense "
+            "tracking, to reduce reliance on credit for working capital.",
+            "Negotiate a structured repayment plan with the lender to address the 41-day past due "
+            "obligation and restore repayment discipline.",
+            "Explore diversification of raw material sourcing to include suppliers from less "
+            "climate-vulnerable regions or investigate sustainable alternative materials.",
+            "Strategically build a buffer inventory of critical raw materials during periods of "
+            "favorable supply and pricing to mitigate future scarcity and cost increases.",
+            "Evaluate opportunities for product diversification or market expansion to reduce "
+            "dependence on local purchasing power and climate-sensitive inputs.",
+            "Seek financial advisory to explore options for debt restructuring or alternative, more "
+            "sustainable financing mechanisms beyond high KCC utilization.",
+        ],
+        is_cached_fallback=True,
+    ),
+}
+
+_DEFAULT_FALLBACK = RiskAssessmentResponse(
+    risk_score=50,
+    risk_classification="MEDIUM",
+    financial_health_summary=(
+        "Live risk analysis is temporarily unavailable. This is a neutral placeholder assessment "
+        "and does not reflect a calculated score for this enterprise."
+    ),
+    climate_risk_impact=(
+        "Live climate analysis is temporarily unavailable. Please retry the assessment once the "
+        "risk engine is reachable."
+    ),
+    actionable_mitigation_steps=[
+        "Retry the risk assessment once the live engine is reachable.",
+    ],
+    is_cached_fallback=True,
+)
+
+
+def get_golden_fallback(enterprise_name: str) -> RiskAssessmentResponse:
+    return DEMO_GOLDEN_CACHE.get(enterprise_name, _DEFAULT_FALLBACK).model_copy(deep=True)
+
+
 def _build_graph():
     graph = StateGraph(GraphState)
     graph.add_node("analyze_climate", analyze_climate)
