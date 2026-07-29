@@ -1,3 +1,6 @@
+from datetime import datetime
+from uuid import UUID
+
 from pydantic import BaseModel, Field
 
 
@@ -37,4 +40,41 @@ class RiskAssessmentResponse(BaseModel):
     actionable_mitigation_steps: list[str]
     is_cached_fallback: bool = Field(
         default=False, description="True when this response was served from the golden fallback cache"
+    )
+
+
+# --- Supabase relational schema (backend/scripts/init_supabase.py) ---
+# These mirror the enterprises / financial_ledgers / climate_snapshots tables row-for-row,
+# as opposed to FinancialProfile/ClimateProfile above which are the flattened, latest-only
+# shape consumed by the risk engine.
+
+
+class Enterprise(BaseModel):
+    id: UUID
+    name: str
+    business_type: str
+    created_at: datetime
+
+
+class FinancialLedger(BaseModel):
+    id: UUID
+    enterprise_id: UUID
+    monthly_revenue_inr: float = Field(..., ge=0)
+    upi_transaction_count: int = Field(..., ge=0)
+    avg_ticket_size_inr: float = Field(..., ge=0)
+    days_past_due: int = Field(..., ge=0)
+    kcc_limit_utilized_pct: float = Field(..., ge=0.0, le=100.0)
+    recorded_at: datetime | None = Field(
+        default=None, description="Day this ledger entry represents; null for the original Phase 1 seed row"
+    )
+
+
+class ClimateSnapshot(BaseModel):
+    id: UUID
+    enterprise_id: UUID
+    ndvi_index: float = Field(..., ge=0.0, le=1.0)
+    soil_moisture_percentage: float = Field(..., ge=0.0, le=100.0)
+    rainfall_deviation_pct: float
+    recorded_at: datetime | None = Field(
+        default=None, description="Day this snapshot represents; null for the original Phase 1 seed row"
     )
