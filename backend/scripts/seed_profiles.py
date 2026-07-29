@@ -1,3 +1,10 @@
+"""The 3 core enterprise profiles used to bootstrap and backfill Supabase.
+
+Moved out of the old backend/mock_data.py when the live API (main.py) was rewired to read
+from Supabase instead of in-memory mock data — this module is now seed-tooling only, used by
+init_supabase.py and seed_dynamic_data.py, and is not imported anywhere in the live app.
+"""
+
 import random
 
 from models import ClimateProfile, FinancialProfile, RiskAssessmentRequest

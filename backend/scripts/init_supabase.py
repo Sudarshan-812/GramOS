@@ -25,7 +25,7 @@ load_dotenv(BACKEND_DIR / ".env")
 import psycopg2
 
 from database import get_supabase_client
-from mock_data import MOCK_PROFILES
+from seed_profiles import MOCK_PROFILES
 
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS enterprises (

@@ -9,7 +9,7 @@ B2B AI-driven cash flow prediction and risk-flagging system for rural micro ente
 - **Backend**: FastAPI (Python 3.13), Uvicorn, Pydantic v2
 - **AI / XAI**: Gemini API via the `google-genai` SDK (not the deprecated `google-generativeai` package) for explainable risk reasoning, using structured outputs (`response_schema`) to guarantee JSON matching `RiskAssessmentResponse`
 - **Geospatial**: Google AlphaEarth satellite climate data
-- **Database**: SQLite (planned — not yet wired up)
+- **Database**: Supabase Postgres, via `backend/database.py` (`supabase-py` REST client for the live app; direct `psycopg2` connections only in `backend/scripts/` for DDL)
 - **Config**: `python-dotenv` for backend environment variables
 
 ## Architecture
@@ -22,8 +22,9 @@ GramOS/
 └── backend/    # FastAPI app (port 8000), Python venv in backend/venv
     ├── main.py        # routes: GET /, GET /api/mock-profiles[/{key}], POST /api/assess-risk
     ├── models.py       # Pydantic v2 schemas (FinancialProfile, ClimateProfile, RiskAssessment*)
-    ├── engine.py       # Gemini structured-output risk analysis (analyze_enterprise_risk)
-    └── mock_data.py    # sample enterprise profiles for frontend testing
+    ├── engine.py       # LangGraph multi-agent risk analysis + golden fallback cache
+    ├── database.py     # Supabase client (get_supabase_client)
+    └── scripts/        # one-off DB bootstrap/seed tooling (not imported by the live app)
 ```
 
 The frontend and backend are decoupled — the frontend calls the backend over HTTP (CORS is enabled for `http://localhost:3000` in `backend/main.py`). There is no shared package/types layer yet.

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import random
 
 from dotenv import load_dotenv
 
@@ -10,9 +11,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from google.genai import errors as genai_errors
 from langchain_google_genai.chat_models import ChatGoogleGenerativeAIError
 
+from database import get_supabase_client
 from engine import get_golden_fallback, risk_graph
-from mock_data import MOCK_PROFILES
-from models import RiskAssessmentRequest, RiskAssessmentResponse
+from models import ClimateProfile, FinancialProfile, RiskAssessmentRequest, RiskAssessmentResponse
 
 logger = logging.getLogger("gramos")
 
@@ -36,15 +37,69 @@ def health_check():
 
 @app.get("/api/mock-profiles")
 def list_mock_profiles():
-    return {"profiles": list(MOCK_PROFILES.keys())}
+    client = get_supabase_client()
+    enterprises = client.table("enterprises").select("id").execute().data
+    return {"profiles": [e["id"] for e in enterprises]}
+
+
+def _synthetic_alpha_earth_embeddings(enterprise_id: str) -> list[float]:
+    # climate_snapshots does not persist AlphaEarth embedding vectors yet; synthesize a
+    # stable per-enterprise placeholder (seeded by enterprise id) so ClimateProfile validation
+    # is satisfied until real AlphaEarth ingestion lands.
+    rng = random.Random(enterprise_id)
+    return [round(rng.uniform(-1.0, 1.0), 4) for _ in range(64)]
 
 
 @app.get("/api/mock-profiles/{profile_key}", response_model=RiskAssessmentRequest)
 def get_mock_profile(profile_key: str):
-    factory = MOCK_PROFILES.get(profile_key)
-    if factory is None:
-        raise HTTPException(status_code=404, detail=f"Unknown mock profile '{profile_key}'")
-    return factory()
+    client = get_supabase_client()
+
+    enterprise_res = client.table("enterprises").select("*").eq("id", profile_key).execute()
+    if not enterprise_res.data:
+        raise HTTPException(status_code=404, detail=f"Unknown enterprise '{profile_key}'")
+    enterprise = enterprise_res.data[0]
+
+    ledger_res = (
+        client.table("financial_ledgers")
+        .select("*")
+        .eq("enterprise_id", profile_key)
+        .order("recorded_at", desc=True, nullsfirst=False)
+        .limit(1)
+        .execute()
+    )
+    if not ledger_res.data:
+        raise HTTPException(status_code=404, detail=f"No financial data for enterprise '{profile_key}'")
+    ledger = ledger_res.data[0]
+
+    climate_res = (
+        client.table("climate_snapshots")
+        .select("*")
+        .eq("enterprise_id", profile_key)
+        .order("recorded_at", desc=True, nullsfirst=False)
+        .limit(1)
+        .execute()
+    )
+    if not climate_res.data:
+        raise HTTPException(status_code=404, detail=f"No climate data for enterprise '{profile_key}'")
+    snapshot = climate_res.data[0]
+
+    return RiskAssessmentRequest(
+        enterprise_name=enterprise["name"],
+        financials=FinancialProfile(
+            business_type=enterprise["business_type"],
+            monthly_revenue_inr=ledger["monthly_revenue_inr"],
+            upi_transaction_count=ledger["upi_transaction_count"],
+            avg_ticket_size_inr=ledger["avg_ticket_size_inr"],
+            days_past_due=ledger["days_past_due"],
+            kcc_utilization_pct=ledger["kcc_limit_utilized_pct"],
+        ),
+        climate=ClimateProfile(
+            ndvi_index=snapshot["ndvi_index"],
+            soil_moisture_percentage=snapshot["soil_moisture_percentage"],
+            rainfall_deviation_pct=snapshot["rainfall_deviation_pct"],
+            alpha_earth_embeddings=_synthetic_alpha_earth_embeddings(profile_key),
+        ),
+    )
 
 
 @app.post("/api/assess-risk", response_model=RiskAssessmentResponse)
