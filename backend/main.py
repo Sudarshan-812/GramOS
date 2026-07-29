@@ -5,7 +5,7 @@ load_dotenv()
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from engine import analyze_enterprise_risk
+from engine import risk_graph
 from mock_data import MOCK_PROFILES
 from models import RiskAssessmentRequest, RiskAssessmentResponse
 
@@ -41,7 +41,8 @@ def get_mock_profile(profile_key: str):
 @app.post("/api/assess-risk", response_model=RiskAssessmentResponse)
 async def assess_risk(request: RiskAssessmentRequest):
     try:
-        return await analyze_enterprise_risk(request)
+        result = await risk_graph.ainvoke({"request": request})
+        return result["final_assessment"]
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:

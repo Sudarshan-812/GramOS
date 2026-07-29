@@ -7,6 +7,9 @@ class FinancialProfile(BaseModel):
     upi_transaction_count: int = Field(..., ge=0, description="Number of UPI transactions in the last 30 days")
     avg_ticket_size_inr: float = Field(..., ge=0, description="Average transaction size in INR")
     days_past_due: int = Field(..., ge=0, description="Days past due on the most recent obligation")
+    kcc_utilization_pct: float = Field(
+        ..., ge=0.0, le=100.0, description="Kisan Credit Card limit utilization, as a percentage"
+    )
 
 
 class ClimateProfile(BaseModel):

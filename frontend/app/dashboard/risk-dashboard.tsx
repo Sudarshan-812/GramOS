@@ -272,7 +272,7 @@ export default function RiskDashboard() {
               <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                 Input Signals
               </h2>
-              <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 lg:grid-cols-6">
+              <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4 lg:grid-cols-7">
                 <Stat
                   icon={Wallet}
                   label="Monthly Revenue"
@@ -295,6 +295,11 @@ export default function RiskDashboard() {
                   }
                   label="Days Past Due"
                   value={String(selected.profile.financials.days_past_due)}
+                />
+                <Stat
+                  icon={Wallet}
+                  label="KCC Utilization"
+                  value={`${selected.profile.financials.kcc_utilization_pct.toFixed(1)}%`}
                 />
                 <Stat
                   icon={Sprout}

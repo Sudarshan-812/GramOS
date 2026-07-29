@@ -23,6 +23,7 @@ def dairy_cooperative_fodder_shortage() -> RiskAssessmentRequest:
             upi_transaction_count=412,
             avg_ticket_size_inr=449.0,
             days_past_due=0,
+            kcc_utilization_pct=72.0,
         ),
         climate=ClimateProfile(
             ndvi_index=0.28,
@@ -43,6 +44,7 @@ def agri_input_retailer_stable_season() -> RiskAssessmentRequest:
             upi_transaction_count=980,
             avg_ticket_size_inr=1_120.0,
             days_past_due=2,
+            kcc_utilization_pct=35.0,
         ),
         climate=ClimateProfile(
             ndvi_index=0.71,
@@ -63,6 +65,7 @@ def handicraft_trader_late_payments() -> RiskAssessmentRequest:
             upi_transaction_count=156,
             avg_ticket_size_inr=590.0,
             days_past_due=41,
+            kcc_utilization_pct=91.0,
         ),
         climate=ClimateProfile(
             ndvi_index=0.55,

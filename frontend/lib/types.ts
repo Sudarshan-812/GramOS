@@ -4,6 +4,7 @@ export interface FinancialProfile {
   upi_transaction_count: number;
   avg_ticket_size_inr: number;
   days_past_due: number;
+  kcc_utilization_pct: number;
 }
 
 export interface ClimateProfile {
