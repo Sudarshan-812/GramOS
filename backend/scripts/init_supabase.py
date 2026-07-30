@@ -60,6 +60,16 @@ CREATE TABLE IF NOT EXISTS document_insights (
     extracted_json JSONB NOT NULL,
     recorded_at TIMESTAMP NOT NULL DEFAULT now()
 );
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id UUID PRIMARY KEY,
+    enterprise_id UUID NOT NULL REFERENCES enterprises(id) ON DELETE CASCADE,
+    officer_id UUID NOT NULL,
+    original_score INT NOT NULL,
+    overridden_score INT NOT NULL,
+    justification TEXT NOT NULL,
+    recorded_at TIMESTAMP NOT NULL DEFAULT now()
+);
 """
 
 
@@ -77,7 +87,10 @@ def create_schema() -> None:
         with conn:
             with conn.cursor() as cur:
                 cur.execute(SCHEMA_SQL)
-        print("Schema ready: enterprises, financial_ledgers, climate_snapshots, document_insights")
+        print(
+            "Schema ready: enterprises, financial_ledgers, climate_snapshots, "
+            "document_insights, audit_logs"
+        )
     finally:
         conn.close()
 

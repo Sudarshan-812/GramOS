@@ -44,3 +44,19 @@ export interface DocumentInsight {
   extracted_json: Record<string, unknown>;
   recorded_at: string;
 }
+
+export interface OverrideScoreRequest {
+  original_score: number;
+  overridden_score: number;
+  justification: string;
+}
+
+export interface AuditLog {
+  id: string;
+  enterprise_id: string;
+  officer_id: string;
+  original_score: number;
+  overridden_score: number;
+  justification: string;
+  recorded_at: string;
+}

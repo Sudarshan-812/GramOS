@@ -11,7 +11,9 @@ import {
   FileText,
   Loader2,
   Milk,
+  PenLine,
   Play,
+  ShieldCheck,
   Sparkles,
   Sprout,
   TrendingUp,
@@ -20,6 +22,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import DocumentUploader from "@/components/DocumentUploader";
+import OverrideScoreModal from "@/components/OverrideScoreModal";
 import RiskChart from "@/components/RiskChart";
 import {
   assessRisk,
@@ -29,6 +32,7 @@ import {
   listMockProfileKeys,
 } from "@/lib/api";
 import type {
+  AuditLog,
   DocumentInsight,
   HistoryPoint,
   RiskAssessmentRequest,
@@ -72,6 +76,15 @@ const RISK_STYLES: Record<
   },
 };
 
+/** Mirrors the LOW/MEDIUM/HIGH/CRITICAL bands engine.py uses for the AI score, so a
+ * manually-overridden score gets the same visual treatment (ring/badge color). */
+function classifyRisk(score: number): RiskClassification {
+  if (score >= 75) return "CRITICAL";
+  if (score >= 50) return "HIGH";
+  if (score >= 25) return "MEDIUM";
+  return "LOW";
+}
+
 function enterpriseIcon(businessType: string) {
   const t = businessType.toLowerCase();
   if (t.includes("dairy")) return Milk;
@@ -93,6 +106,16 @@ export default function RiskDashboard() {
   const [assessing, setAssessing] = useState(false);
   const [assessError, setAssessError] = useState<string | null>(null);
   const [checkedSteps, setCheckedSteps] = useState<Set<number>>(new Set());
+
+  const [overrideModalOpen, setOverrideModalOpen] = useState(false);
+  const [override, setOverride] = useState<AuditLog | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   const [documents, setDocuments] = useState<DocumentInsight[]>([]);
   // Which enterprise key `documents`/`documentsError` currently reflect; used to derive
@@ -176,12 +199,14 @@ export default function RiskDashboard() {
     setAssessment(null);
     setAssessError(null);
     setCheckedSteps(new Set());
+    setOverride(null);
   }
 
   async function handleSimulate() {
     if (!selected) return;
     setAssessing(true);
     setAssessError(null);
+    setOverride(null);
     try {
       const result = await assessRisk(selected.profile);
       setAssessment(result);
@@ -194,6 +219,14 @@ export default function RiskDashboard() {
     } finally {
       setAssessing(false);
     }
+  }
+
+  function handleOverrideSuccess(auditLog: AuditLog) {
+    setOverride(auditLog);
+    setOverrideModalOpen(false);
+    setToast(
+      `Score overridden to ${auditLog.overridden_score}/100 and logged to the audit trail.`
+    );
   }
 
   function toggleStep(index: number) {
@@ -397,6 +430,8 @@ export default function RiskDashboard() {
                 assessing={assessing}
                 assessError={assessError}
                 assessment={assessment}
+                override={override}
+                onOverrideClick={() => setOverrideModalOpen(true)}
               />
             </div>
 
@@ -468,6 +503,22 @@ export default function RiskDashboard() {
           </div>
         )}
       </main>
+
+      {overrideModalOpen && selected && assessment && (
+        <OverrideScoreModal
+          enterpriseId={selected.key}
+          currentScore={override?.overridden_score ?? assessment.risk_score}
+          onClose={() => setOverrideModalOpen(false)}
+          onSuccess={handleOverrideSuccess}
+        />
+      )}
+
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-card px-4 py-3 text-sm text-slate-100 shadow-lg shadow-black/40">
+          <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-400" />
+          {toast}
+        </div>
+      )}
     </div>
   );
 }
@@ -615,10 +666,14 @@ function RiskScorePanel({
   assessing,
   assessError,
   assessment,
+  override,
+  onOverrideClick,
 }: {
   assessing: boolean;
   assessError: string | null;
   assessment: RiskAssessmentResponse | null;
+  override: AuditLog | null;
+  onOverrideClick: () => void;
 }) {
   if (assessing) {
     return (
@@ -655,10 +710,14 @@ function RiskScorePanel({
     );
   }
 
-  const styles = RISK_STYLES[assessment.risk_classification];
+  const displayScore = override ? override.overridden_score : assessment.risk_score;
+  const displayClassification = override
+    ? classifyRisk(override.overridden_score)
+    : assessment.risk_classification;
+  const styles = RISK_STYLES[displayClassification];
   const radius = 54;
   const circumference = 2 * Math.PI * radius;
-  const clampedScore = Math.min(100, Math.max(0, assessment.risk_score));
+  const clampedScore = Math.min(100, Math.max(0, displayScore));
   const offset = circumference - (clampedScore / 100) * circumference;
 
   return (
@@ -692,7 +751,7 @@ function RiskScorePanel({
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className="text-3xl font-bold text-slate-50">
-            {assessment.risk_score}
+            {displayScore}
           </span>
           <span className="text-xs text-slate-500">/ 100</span>
         </div>
@@ -701,18 +760,37 @@ function RiskScorePanel({
         className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-semibold ${styles.badge}`}
       >
         <span className={`h-2 w-2 rounded-full ${styles.dot}`} />
-        {assessment.risk_classification}
+        {displayClassification}
       </span>
-      {assessment.is_cached_fallback && (
-        <span className="inline-flex items-center gap-1 rounded-full border border-gray-700 bg-onyx px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-500">
-          <WifiOff className="h-3 w-3" />
-          Offline / Fallback Mode
+
+      {override ? (
+        <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-400">
+          <ShieldCheck className="h-3 w-3" />
+          Human Overridden
         </span>
+      ) : (
+        assessment.is_cached_fallback && (
+          <span className="inline-flex items-center gap-1 rounded-full border border-gray-700 bg-onyx px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-500">
+            <WifiOff className="h-3 w-3" />
+            Offline / Fallback Mode
+          </span>
+        )
       )}
+
       <p className="text-xs leading-5 text-slate-500">
-        Generated by the Gemini XAI risk engine, fusing transaction logs with
-        AlphaEarth climate metrics.
+        {override
+          ? `Overridden from the AI score of ${override.original_score} — logged to the compliance audit trail.`
+          : "Generated by the Gemini XAI risk engine, fusing transaction logs with AlphaEarth climate metrics."}
       </p>
+
+      <button
+        type="button"
+        onClick={onOverrideClick}
+        className="mt-1 inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-gray-700 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:border-amber-400/50 hover:text-amber-400"
+      >
+        <PenLine className="h-3.5 w-3.5" />
+        {override ? "Override Again" : "Manual Override"}
+      </button>
     </div>
   );
 }

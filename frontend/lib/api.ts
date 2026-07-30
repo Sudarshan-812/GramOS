@@ -1,7 +1,9 @@
 import { createClient } from "./supabase/client";
 import type {
+  AuditLog,
   DocumentInsight,
   HistoryPoint,
+  OverrideScoreRequest,
   RiskAssessmentRequest,
   RiskAssessmentResponse,
 } from "./types";
@@ -96,6 +98,22 @@ export async function getDocumentInsights(
   const res = await fetch(
     `${API_BASE_URL}/api/enterprises/${enterpriseId}/documents`,
     { headers: await authHeaders() }
+  );
+  if (!res.ok) throw new Error(await parseErrorDetail(res));
+  return res.json();
+}
+
+export async function overrideScore(
+  enterpriseId: string,
+  payload: OverrideScoreRequest
+): Promise<AuditLog> {
+  const res = await fetch(
+    `${API_BASE_URL}/api/enterprises/${enterpriseId}/override-score`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+      body: JSON.stringify(payload),
+    }
   );
   if (!res.ok) throw new Error(await parseErrorDetail(res));
   return res.json();

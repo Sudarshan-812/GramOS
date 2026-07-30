@@ -20,10 +20,12 @@ from langchain_google_genai.chat_models import ChatGoogleGenerativeAIError
 from database import get_supabase_client
 from engine import extract_document_insights, get_golden_fallback, risk_graph
 from models import (
+    AuditLog,
     ClimateProfile,
     DocumentInsight,
     FinancialProfile,
     HistoryPoint,
+    OverrideScoreRequest,
     RiskAssessmentRequest,
     RiskAssessmentResponse,
 )
@@ -318,3 +320,35 @@ def list_document_insights(enterprise_id: str):
         .data
     )
     return rows
+
+
+@app.post(
+    "/api/enterprises/{enterprise_id}/override-score",
+    response_model=AuditLog,
+)
+def override_score(
+    enterprise_id: str,
+    request: OverrideScoreRequest,
+    claims: dict = Depends(verify_jwt),
+):
+    officer_id = claims.get("sub")
+    if not officer_id:
+        raise HTTPException(status_code=401, detail="Token is missing a subject (user id) claim")
+
+    client = get_supabase_client()
+
+    enterprise_res = client.table("enterprises").select("id").eq("id", enterprise_id).execute()
+    if not enterprise_res.data:
+        raise HTTPException(status_code=404, detail=f"Unknown enterprise '{enterprise_id}'")
+
+    row = {
+        "id": str(uuid.uuid4()),
+        "enterprise_id": enterprise_id,
+        "officer_id": officer_id,
+        "original_score": request.original_score,
+        "overridden_score": request.overridden_score,
+        "justification": request.justification,
+        "recorded_at": datetime.now(timezone.utc).isoformat(),
+    }
+    insert_res = client.table("audit_logs").insert(row).execute()
+    return AuditLog.model_validate(insert_res.data[0])

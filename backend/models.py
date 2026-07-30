@@ -98,3 +98,19 @@ class DocumentInsight(BaseModel):
         ..., description="Underwriting-relevant fields Gemini extracted from the document"
     )
     recorded_at: datetime
+
+
+class OverrideScoreRequest(BaseModel):
+    original_score: int = Field(..., ge=0, le=100, description="The AI-generated risk score being overridden")
+    overridden_score: int = Field(..., ge=0, le=100, description="The loan officer's replacement score")
+    justification: str = Field(..., min_length=1, description="Mandatory reason for the override")
+
+
+class AuditLog(BaseModel):
+    id: UUID
+    enterprise_id: UUID
+    officer_id: UUID = Field(..., description="Supabase auth user id of the overriding loan officer")
+    original_score: int
+    overridden_score: int
+    justification: str
+    recorded_at: datetime
