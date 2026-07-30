@@ -16,6 +16,39 @@
      (#FBBF24) exactly, so only the two surface tones need new tokens. */
   --color-onyx: #121412;
   --color-card: #1e221f;
+
+  /* Feature-icon animations (components/icons/FeatureIcons.tsx) */
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-twinkle: twinkle 1.8s ease-in-out infinite;
+  --animate-spin-slow: spin-slow 10s linear infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15%);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 body {
