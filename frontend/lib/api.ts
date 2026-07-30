@@ -1,5 +1,10 @@
 import { createClient } from "./supabase/client";
-import type { HistoryPoint, RiskAssessmentRequest, RiskAssessmentResponse } from "./types";
+import type {
+  DocumentInsight,
+  HistoryPoint,
+  RiskAssessmentRequest,
+  RiskAssessmentResponse,
+} from "./types";
 
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
@@ -60,6 +65,38 @@ export async function assessRisk(
     headers: { "Content-Type": "application/json", ...(await authHeaders()) },
     body: JSON.stringify(payload),
   });
+  if (!res.ok) throw new Error(await parseErrorDetail(res));
+  return res.json();
+}
+
+export async function uploadDocument(
+  enterpriseId: string,
+  file: File
+): Promise<DocumentInsight> {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(
+    `${API_BASE_URL}/api/enterprises/${enterpriseId}/upload-document`,
+    {
+      method: "POST",
+      // Do not set Content-Type here — the browser must set it (with the
+      // multipart boundary) itself when the body is a FormData instance.
+      headers: await authHeaders(),
+      body: formData,
+    }
+  );
+  if (!res.ok) throw new Error(await parseErrorDetail(res));
+  return res.json();
+}
+
+export async function getDocumentInsights(
+  enterpriseId: string
+): Promise<DocumentInsight[]> {
+  const res = await fetch(
+    `${API_BASE_URL}/api/enterprises/${enterpriseId}/documents`,
+    { headers: await authHeaders() }
+  );
   if (!res.ok) throw new Error(await parseErrorDetail(res));
   return res.json();
 }

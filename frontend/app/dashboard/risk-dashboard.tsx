@@ -8,6 +8,7 @@ import {
   Circle,
   CloudRain,
   Droplets,
+  FileText,
   Loader2,
   Milk,
   Play,
@@ -17,14 +18,17 @@ import {
   Wallet,
   WifiOff,
 } from "lucide-react";
+import DocumentUploader from "@/components/DocumentUploader";
 import RiskChart from "@/components/RiskChart";
 import {
   assessRisk,
+  getDocumentInsights,
   getEnterpriseHistory,
   getMockProfile,
   listMockProfileKeys,
 } from "@/lib/api";
 import type {
+  DocumentInsight,
   HistoryPoint,
   RiskAssessmentRequest,
   RiskAssessmentResponse,
@@ -88,6 +92,43 @@ export default function RiskDashboard() {
   const [assessing, setAssessing] = useState(false);
   const [assessError, setAssessError] = useState<string | null>(null);
   const [checkedSteps, setCheckedSteps] = useState<Set<number>>(new Set());
+
+  const [documents, setDocuments] = useState<DocumentInsight[]>([]);
+  // Which enterprise key `documents`/`documentsError` currently reflect; used to derive
+  // documentsLoading below instead of a separately-managed boolean set inside the effect.
+  const [documentsForKey, setDocumentsForKey] = useState<string | null>(null);
+  const [documentsError, setDocumentsError] = useState<string | null>(null);
+  const documentsLoading =
+    selectedKey !== null && documentsForKey !== selectedKey;
+
+  useEffect(() => {
+    if (!selectedKey) return;
+
+    let cancelled = false;
+
+    getDocumentInsights(selectedKey)
+      .then((docs) => {
+        if (cancelled) return;
+        setDocuments(docs);
+        setDocumentsError(null);
+        setDocumentsForKey(selectedKey);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setDocumentsError(
+          err instanceof Error ? err.message : "Failed to load documents"
+        );
+        setDocumentsForKey(selectedKey);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedKey]);
+
+  function handleDocumentUploaded(insight: DocumentInsight) {
+    setDocuments((prev) => [insight, ...prev]);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -333,6 +374,17 @@ export default function RiskDashboard() {
               </dl>
             </div>
 
+            {/* Document intelligence */}
+            <DocumentUploader
+              enterpriseId={selected.key}
+              onUploadSuccess={handleDocumentUploaded}
+            />
+            <DocumentInsightsCard
+              documents={documents}
+              loading={documentsLoading}
+              error={documentsError}
+            />
+
             {/* Result area */}
             {assessError && (
               <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-6">
@@ -447,6 +499,99 @@ function Stat({
         {label}
       </dt>
       <dd className="mt-1 text-lg font-semibold text-slate-900">{value}</dd>
+    </div>
+  );
+}
+
+function formatFieldLabel(key: string): string {
+  return key
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function formatFieldValue(value: unknown): string {
+  if (value === null || value === undefined || value === "") return "—";
+  if (typeof value !== "object") return String(value);
+  if (Array.isArray(value)) return value.map(formatFieldValue).join(", ");
+
+  // Extraction commonly nests figures as { value: 45230.5, currency: "INR" }
+  // or { value: 68, unit: "percent" } — render those as a single readable string.
+  const obj = value as Record<string, unknown>;
+  if ("value" in obj) {
+    const unit = obj.currency ?? obj.unit;
+    return unit ? `${String(obj.value)} ${String(unit)}` : String(obj.value);
+  }
+
+  return Object.entries(obj)
+    .map(([k, v]) => `${formatFieldLabel(k)}: ${formatFieldValue(v)}`)
+    .join(", ");
+}
+
+function DocumentInsightsCard({
+  documents,
+  loading,
+  error,
+}: {
+  documents: DocumentInsight[];
+  loading: boolean;
+  error: string | null;
+}) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-6">
+      <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        Document Insights
+      </h2>
+
+      {loading && (
+        <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Loading documents...
+        </div>
+      )}
+
+      {error && !loading && <p className="mt-4 text-sm text-red-600">{error}</p>}
+
+      {!loading && !error && documents.length === 0 && (
+        <p className="mt-4 text-sm text-slate-400">
+          No documents uploaded yet for this enterprise.
+        </p>
+      )}
+
+      {!loading && !error && documents.length > 0 && (
+        <div className="mt-4 flex flex-col gap-4">
+          {documents.map((doc) => (
+            <div
+              key={doc.id}
+              className="rounded-xl border border-slate-100 bg-slate-50 p-4"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                  <FileText className="h-3.5 w-3.5" />
+                  {doc.document_type}
+                </span>
+                <span className="text-xs text-slate-400">
+                  {new Date(doc.recorded_at).toLocaleString("en-IN")}
+                </span>
+              </div>
+              <dl className="mt-3 grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
+                {Object.entries(doc.extracted_json).map(([key, value]) => (
+                  <div
+                    key={key}
+                    className="flex items-baseline justify-between gap-3 border-b border-slate-200 py-1"
+                  >
+                    <dt className="text-xs text-slate-500">
+                      {formatFieldLabel(key)}
+                    </dt>
+                    <dd className="text-right text-sm font-medium text-slate-900">
+                      {formatFieldValue(value)}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -295,3 +295,26 @@ async def upload_document(enterprise_id: str, file: UploadFile = File(...)):
     }
     insert_res = client.table("document_insights").insert(row).execute()
     return DocumentInsight.model_validate(insert_res.data[0])
+
+
+@app.get(
+    "/api/enterprises/{enterprise_id}/documents",
+    response_model=list[DocumentInsight],
+    dependencies=[Depends(verify_jwt)],
+)
+def list_document_insights(enterprise_id: str):
+    client = get_supabase_client()
+
+    enterprise_res = client.table("enterprises").select("id").eq("id", enterprise_id).execute()
+    if not enterprise_res.data:
+        raise HTTPException(status_code=404, detail=f"Unknown enterprise '{enterprise_id}'")
+
+    rows = (
+        client.table("document_insights")
+        .select("*")
+        .eq("enterprise_id", enterprise_id)
+        .order("recorded_at", desc=True)
+        .execute()
+        .data
+    )
+    return rows

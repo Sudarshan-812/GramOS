@@ -36,3 +36,11 @@ export interface HistoryPoint {
   monthly_revenue_inr: number;
   ndvi_index: number;
 }
+
+export interface DocumentInsight {
+  id: string;
+  enterprise_id: string;
+  document_type: string;
+  extracted_json: Record<string, unknown>;
+  recorded_at: string;
+}
