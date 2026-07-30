@@ -1,5 +1,6 @@
 import { createClient } from "./supabase/client";
 import type {
+  Alert,
   AuditLog,
   DocumentInsight,
   HistoryPoint,
@@ -114,6 +115,15 @@ export async function overrideScore(
       headers: { "Content-Type": "application/json", ...(await authHeaders()) },
       body: JSON.stringify(payload),
     }
+  );
+  if (!res.ok) throw new Error(await parseErrorDetail(res));
+  return res.json();
+}
+
+export async function getAlerts(enterpriseId: string): Promise<Alert[]> {
+  const res = await fetch(
+    `${API_BASE_URL}/api/enterprises/${enterpriseId}/alerts`,
+    { headers: await authHeaders() }
   );
   if (!res.ok) throw new Error(await parseErrorDetail(res));
   return res.json();

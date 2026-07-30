@@ -4,6 +4,7 @@ import logging
 import os
 import random
 import uuid
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
 from dotenv import load_dotenv
@@ -11,6 +12,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import jwt
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
@@ -20,6 +22,7 @@ from langchain_google_genai.chat_models import ChatGoogleGenerativeAIError
 from database import get_supabase_client
 from engine import extract_document_insights, get_golden_fallback, risk_graph
 from models import (
+    Alert,
     AuditLog,
     ClimateProfile,
     DocumentInsight,
@@ -29,6 +32,7 @@ from models import (
     RiskAssessmentRequest,
     RiskAssessmentResponse,
 )
+from worker import check_climate_thresholds
 
 HISTORY_DAYS = 30
 
@@ -89,7 +93,24 @@ def verify_jwt(token: str = Depends(oauth2_scheme)) -> dict:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
 
 
-app = FastAPI(title="GramOS API", version="0.1.0")
+scheduler = AsyncIOScheduler()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    scheduler.add_job(
+        check_climate_thresholds,
+        "interval",
+        minutes=1,
+        id="check_climate_thresholds",
+    )
+    scheduler.start()
+    logger.info("Scheduler started: check_climate_thresholds every 1 minute")
+    yield
+    scheduler.shutdown()
+
+
+app = FastAPI(title="GramOS API", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -352,3 +373,26 @@ def override_score(
     }
     insert_res = client.table("audit_logs").insert(row).execute()
     return AuditLog.model_validate(insert_res.data[0])
+
+
+@app.get(
+    "/api/enterprises/{enterprise_id}/alerts",
+    response_model=list[Alert],
+    dependencies=[Depends(verify_jwt)],
+)
+def list_alerts(enterprise_id: str):
+    client = get_supabase_client()
+
+    enterprise_res = client.table("enterprises").select("id").eq("id", enterprise_id).execute()
+    if not enterprise_res.data:
+        raise HTTPException(status_code=404, detail=f"Unknown enterprise '{enterprise_id}'")
+
+    rows = (
+        client.table("alerts")
+        .select("*")
+        .eq("enterprise_id", enterprise_id)
+        .order("created_at", desc=True)
+        .execute()
+        .data
+    )
+    return rows

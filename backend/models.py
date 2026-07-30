@@ -114,3 +114,12 @@ class AuditLog(BaseModel):
     overridden_score: int
     justification: str
     recorded_at: datetime
+
+
+class Alert(BaseModel):
+    id: UUID
+    enterprise_id: UUID
+    alert_type: str = Field(..., description="e.g. 'CLIMATE_WARNING'")
+    message: str
+    is_read: bool = False
+    created_at: datetime

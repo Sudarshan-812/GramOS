@@ -26,12 +26,14 @@ import OverrideScoreModal from "@/components/OverrideScoreModal";
 import RiskChart from "@/components/RiskChart";
 import {
   assessRisk,
+  getAlerts,
   getDocumentInsights,
   getEnterpriseHistory,
   getMockProfile,
   listMockProfileKeys,
 } from "@/lib/api";
 import type {
+  Alert,
   AuditLog,
   DocumentInsight,
   HistoryPoint,
@@ -153,6 +155,33 @@ export default function RiskDashboard() {
   function handleDocumentUploaded(insight: DocumentInsight) {
     setDocuments((prev) => [insight, ...prev]);
   }
+
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [alertsForKey, setAlertsForKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!selectedKey) return;
+
+    let cancelled = false;
+
+    getAlerts(selectedKey)
+      .then((rows) => {
+        if (cancelled) return;
+        setAlerts(rows);
+        setAlertsForKey(selectedKey);
+      })
+      .catch(() => {
+        // Alerts are a non-critical banner; a failed fetch shouldn't block the
+        // rest of the dashboard, so just leave the banner empty.
+        if (!cancelled) setAlertsForKey(selectedKey);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedKey]);
+
+  const unreadAlerts = alerts.filter((a) => !a.is_read && a.enterprise_id === alertsForKey);
 
   useEffect(() => {
     let cancelled = false;
@@ -329,6 +358,26 @@ export default function RiskDashboard() {
           </div>
         ) : (
           <div className="mx-auto flex max-w-6xl flex-col gap-8">
+            {/* Proactive risk alerts */}
+            {unreadAlerts.length > 0 && (
+              <div className="flex flex-col gap-2">
+                {unreadAlerts.map((alert) => (
+                  <div
+                    key={alert.id}
+                    className="flex items-start gap-3 rounded-2xl border border-red-500/40 bg-red-500/10 p-4"
+                  >
+                    <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-red-400">
+                        {alert.alert_type.replace(/_/g, " ")}
+                      </p>
+                      <p className="mt-0.5 text-sm text-red-200">{alert.message}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Header */}
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
               <div>

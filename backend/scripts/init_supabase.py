@@ -70,6 +70,15 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     justification TEXT NOT NULL,
     recorded_at TIMESTAMP NOT NULL DEFAULT now()
 );
+
+CREATE TABLE IF NOT EXISTS alerts (
+    id UUID PRIMARY KEY,
+    enterprise_id UUID NOT NULL REFERENCES enterprises(id) ON DELETE CASCADE,
+    alert_type TEXT NOT NULL,
+    message TEXT NOT NULL,
+    is_read BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMP NOT NULL DEFAULT now()
+);
 """
 
 
@@ -89,7 +98,7 @@ def create_schema() -> None:
                 cur.execute(SCHEMA_SQL)
         print(
             "Schema ready: enterprises, financial_ledgers, climate_snapshots, "
-            "document_insights, audit_logs"
+            "document_insights, audit_logs, alerts"
         )
     finally:
         conn.close()
