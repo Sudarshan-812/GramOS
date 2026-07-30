@@ -1,7 +1,16 @@
+import { createClient } from "./supabase/client";
 import type { HistoryPoint, RiskAssessmentRequest, RiskAssessmentResponse } from "./types";
 
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+
+async function authHeaders(): Promise<HeadersInit> {
+  const supabase = createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  return session ? { Authorization: `Bearer ${session.access_token}` } : {};
+}
 
 async function parseErrorDetail(res: Response): Promise<string> {
   try {
@@ -14,7 +23,9 @@ async function parseErrorDetail(res: Response): Promise<string> {
 }
 
 export async function listMockProfileKeys(): Promise<string[]> {
-  const res = await fetch(`${API_BASE_URL}/api/mock-profiles`);
+  const res = await fetch(`${API_BASE_URL}/api/mock-profiles`, {
+    headers: await authHeaders(),
+  });
   if (!res.ok) throw new Error(await parseErrorDetail(res));
   const data: { profiles: string[] } = await res.json();
   return data.profiles;
@@ -23,7 +34,9 @@ export async function listMockProfileKeys(): Promise<string[]> {
 export async function getMockProfile(
   key: string
 ): Promise<RiskAssessmentRequest> {
-  const res = await fetch(`${API_BASE_URL}/api/mock-profiles/${key}`);
+  const res = await fetch(`${API_BASE_URL}/api/mock-profiles/${key}`, {
+    headers: await authHeaders(),
+  });
   if (!res.ok) throw new Error(await parseErrorDetail(res));
   return res.json();
 }
@@ -32,7 +45,8 @@ export async function getEnterpriseHistory(
   enterpriseId: string
 ): Promise<HistoryPoint[]> {
   const res = await fetch(
-    `${API_BASE_URL}/api/enterprises/${enterpriseId}/history`
+    `${API_BASE_URL}/api/enterprises/${enterpriseId}/history`,
+    { headers: await authHeaders() }
   );
   if (!res.ok) throw new Error(await parseErrorDetail(res));
   return res.json();
@@ -43,7 +57,7 @@ export async function assessRisk(
 ): Promise<RiskAssessmentResponse> {
   const res = await fetch(`${API_BASE_URL}/api/assess-risk`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error(await parseErrorDetail(res));

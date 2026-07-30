@@ -1,13 +1,16 @@
 import asyncio
 import logging
+import os
 import random
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-from fastapi import FastAPI, HTTPException
+import jwt
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
 from google.genai import errors as genai_errors
 from langchain_google_genai.chat_models import ChatGoogleGenerativeAIError
 
@@ -27,6 +30,48 @@ logger = logging.getLogger("gramos")
 
 ASSESS_RISK_TIMEOUT_SECONDS = 4.5
 
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+
+# tokenUrl is unused (Supabase issues tokens, not us) but required by
+# OAuth2PasswordBearer to document the security scheme for /docs.
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+# This project uses Supabase's asymmetric JWT Signing Keys (ECC P-256), not a
+# static HS256 shared secret, so tokens are verified against Supabase's public
+# JWKS rather than a copied secret. PyJWKClient fetches and caches the keyset.
+_jwks_client: jwt.PyJWKClient | None = None
+
+
+def _get_jwks_client() -> jwt.PyJWKClient:
+    global _jwks_client
+    if _jwks_client is None:
+        if not SUPABASE_URL:
+            raise RuntimeError(
+                "SUPABASE_URL must be set. Add it to backend/.env (see .env.example)."
+            )
+        _jwks_client = jwt.PyJWKClient(f"{SUPABASE_URL}/auth/v1/.well-known/jwks.json")
+    return _jwks_client
+
+
+def verify_jwt(token: str = Depends(oauth2_scheme)) -> dict:
+    try:
+        signing_key = _get_jwks_client().get_signing_key_from_jwt(token)
+        return jwt.decode(
+            token,
+            signing_key.key,
+            algorithms=["ES256", "RS256"],
+            audience="authenticated",
+        )
+    except jwt.PyJWTError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(exc)) from exc
+
+
 app = FastAPI(title="GramOS API", version="0.1.0")
 
 app.add_middleware(
@@ -43,7 +88,7 @@ def health_check():
     return {"status": "ok", "service": "GramOS API"}
 
 
-@app.get("/api/mock-profiles")
+@app.get("/api/mock-profiles", dependencies=[Depends(verify_jwt)])
 def list_mock_profiles():
     client = get_supabase_client()
     enterprises = client.table("enterprises").select("id").execute().data
@@ -58,7 +103,11 @@ def _synthetic_alpha_earth_embeddings(enterprise_id: str) -> list[float]:
     return [round(rng.uniform(-1.0, 1.0), 4) for _ in range(64)]
 
 
-@app.get("/api/mock-profiles/{profile_key}", response_model=RiskAssessmentRequest)
+@app.get(
+    "/api/mock-profiles/{profile_key}",
+    response_model=RiskAssessmentRequest,
+    dependencies=[Depends(verify_jwt)],
+)
 def get_mock_profile(profile_key: str):
     client = get_supabase_client()
 
@@ -110,7 +159,11 @@ def get_mock_profile(profile_key: str):
     )
 
 
-@app.get("/api/enterprises/{enterprise_id}/history", response_model=list[HistoryPoint])
+@app.get(
+    "/api/enterprises/{enterprise_id}/history",
+    response_model=list[HistoryPoint],
+    dependencies=[Depends(verify_jwt)],
+)
 def get_enterprise_history(enterprise_id: str):
     client = get_supabase_client()
 
@@ -150,7 +203,11 @@ def get_enterprise_history(enterprise_id: str):
     return points
 
 
-@app.post("/api/assess-risk", response_model=RiskAssessmentResponse)
+@app.post(
+    "/api/assess-risk",
+    response_model=RiskAssessmentResponse,
+    dependencies=[Depends(verify_jwt)],
+)
 async def assess_risk(request: RiskAssessmentRequest):
     try:
         result = await asyncio.wait_for(
