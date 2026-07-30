@@ -59,7 +59,7 @@ export default function DocumentUploader({
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6">
+    <div className="rounded-2xl border border-gray-700/60 bg-card p-6">
       <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
         Upload Document
       </h2>
@@ -78,10 +78,10 @@ export default function DocumentUploader({
         onClick={() => !uploading && inputRef.current?.click()}
         className={`mt-4 flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-10 text-center transition ${
           uploading
-            ? "cursor-not-allowed border-slate-200 bg-slate-50"
+            ? "cursor-not-allowed border-gray-700 bg-onyx"
             : isDragging
-              ? "cursor-pointer border-slate-900 bg-slate-50"
-              : "cursor-pointer border-slate-300 hover:border-slate-400 hover:bg-slate-50"
+              ? "cursor-pointer border-amber-400 bg-onyx"
+              : "cursor-pointer border-gray-700 hover:border-gray-500 hover:bg-onyx"
         }`}
       >
         <input
@@ -98,18 +98,18 @@ export default function DocumentUploader({
 
         {uploading ? (
           <>
-            <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-            <p className="text-sm text-slate-500">
+            <Loader2 className="h-8 w-8 animate-spin text-amber-400" />
+            <p className="text-sm text-slate-400">
               Extracting insights with Gemini...
             </p>
           </>
         ) : (
           <>
-            <UploadCloud className="h-8 w-8 text-slate-400" />
-            <p className="text-sm font-medium text-slate-700">
+            <UploadCloud className="h-8 w-8 text-slate-500" />
+            <p className="text-sm font-medium text-slate-300">
               Drag &amp; drop a file here, or click to browse
             </p>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               PDF, JPEG, PNG, WEBP, HEIC — up to 20MB
             </p>
           </>
@@ -117,7 +117,7 @@ export default function DocumentUploader({
       </div>
 
       {error && (
-        <div className="mt-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div className="mt-4 flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           {error}
         </div>

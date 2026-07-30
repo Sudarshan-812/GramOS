@@ -18,6 +18,7 @@ import {
   Wallet,
   WifiOff,
 } from "lucide-react";
+import Image from "next/image";
 import DocumentUploader from "@/components/DocumentUploader";
 import RiskChart from "@/components/RiskChart";
 import {
@@ -50,24 +51,24 @@ const RISK_STYLES: Record<
   }
 > = {
   LOW: {
-    ring: "text-emerald-500",
-    badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    dot: "bg-emerald-500",
+    ring: "text-emerald-400",
+    badge: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
+    dot: "bg-emerald-400",
   },
   MEDIUM: {
-    ring: "text-amber-500",
-    badge: "bg-amber-50 text-amber-700 border-amber-200",
-    dot: "bg-amber-500",
+    ring: "text-amber-400",
+    badge: "bg-amber-500/10 text-amber-400 border-amber-500/30",
+    dot: "bg-amber-400",
   },
   HIGH: {
-    ring: "text-orange-500",
-    badge: "bg-orange-50 text-orange-700 border-orange-200",
-    dot: "bg-orange-500",
+    ring: "text-orange-400",
+    badge: "bg-orange-500/10 text-orange-400 border-orange-500/30",
+    dot: "bg-orange-400",
   },
   CRITICAL: {
-    ring: "text-red-500",
-    badge: "bg-red-50 text-red-700 border-red-200",
-    dot: "bg-red-500",
+    ring: "text-red-400",
+    badge: "bg-red-500/10 text-red-400 border-red-500/30",
+    dot: "bg-red-400",
   },
 };
 
@@ -205,28 +206,37 @@ export default function RiskDashboard() {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-onyx">
       {/* Sidebar */}
-      <aside className="flex w-72 shrink-0 flex-col border-r border-slate-200 bg-white">
-        <div className="border-b border-slate-200 px-5 py-4">
-          <h1 className="text-xl font-semibold tracking-tight text-slate-900">
-            GramOS
-          </h1>
+      <aside className="flex w-72 shrink-0 flex-col border-r border-gray-700/60 bg-card">
+        <div className="border-b border-gray-700/60 px-5 py-4">
+          <div className="flex items-center gap-2">
+            <Image
+              src="/GramOStpt.png"
+              alt="GramOS"
+              width={1024}
+              height={1024}
+              className="h-6 w-6"
+            />
+            <h1 className="text-xl font-semibold tracking-tight text-slate-50">
+              GramOS
+            </h1>
+          </div>
           <p className="mt-1 text-xs text-slate-500">Risk Portfolio</p>
         </div>
 
         <div className="flex-1 overflow-y-auto p-3">
           {loadingProfiles && (
-            <div className="flex items-center gap-2 px-2 py-4 text-sm text-slate-500">
+            <div className="flex items-center gap-2 px-2 py-4 text-sm text-slate-400">
               <Loader2 className="h-4 w-4 animate-spin" />
               Loading enterprises...
             </div>
           )}
 
           {profilesError && (
-            <div className="mx-1 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+            <div className="mx-1 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-400">
               {profilesError}
-              <p className="mt-1 text-red-500">
+              <p className="mt-1 text-red-400/80">
                 Is the backend running on :8000?
               </p>
             </div>
@@ -241,20 +251,20 @@ export default function RiskDashboard() {
                   <button
                     type="button"
                     onClick={() => handleSelect(key)}
-                    className={`flex w-full items-start gap-3 rounded-lg px-3 py-3 text-left transition ${
+                    className={`flex w-full cursor-pointer items-start gap-3 rounded-lg px-3 py-3 text-left transition ${
                       isSelected
-                        ? "bg-slate-900 text-slate-50"
-                        : "text-slate-700 hover:bg-slate-100"
+                        ? "bg-amber-400 text-onyx"
+                        : "text-slate-300 hover:bg-onyx"
                     }`}
                   >
                     <div
                       className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md ${
-                        isSelected ? "bg-emerald-500" : "bg-slate-100"
+                        isSelected ? "bg-onyx/10" : "bg-onyx"
                       }`}
                     >
                       <Icon
                         className={`h-4.5 w-4.5 ${
-                          isSelected ? "text-slate-900" : "text-slate-500"
+                          isSelected ? "text-onyx" : "text-slate-500"
                         }`}
                       />
                     </div>
@@ -264,7 +274,7 @@ export default function RiskDashboard() {
                       </p>
                       <p
                         className={`truncate text-xs ${
-                          isSelected ? "text-slate-400" : "text-slate-500"
+                          isSelected ? "text-onyx/70" : "text-slate-500"
                         }`}
                       >
                         {profile.financials.business_type}
@@ -285,14 +295,14 @@ export default function RiskDashboard() {
             {loadingProfiles ? "Loading..." : "Select an enterprise to begin."}
           </div>
         ) : (
-          <div className="mx-auto flex max-w-4xl flex-col gap-8">
+          <div className="mx-auto flex max-w-6xl flex-col gap-8">
             {/* Header */}
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
               <div>
-                <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+                <h1 className="text-2xl font-semibold tracking-tight text-slate-50">
                   {selected.profile.enterprise_name}
                 </h1>
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 text-sm text-slate-400">
                   {selected.profile.financials.business_type}
                 </p>
               </div>
@@ -300,7 +310,7 @@ export default function RiskDashboard() {
                 type="button"
                 onClick={handleSimulate}
                 disabled={assessing}
-                className="inline-flex items-center gap-2 rounded-md bg-slate-900 px-5 py-2.5 text-sm font-semibold text-slate-50 transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-amber-400 px-5 py-2.5 text-sm font-semibold text-onyx transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {assessing ? (
                   <>
@@ -316,12 +326,12 @@ export default function RiskDashboard() {
               </button>
             </div>
 
-            {/* Input signal snapshot */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-6">
+            {/* Input signal tiles */}
+            <div>
               <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                 Input Signals
               </h2>
-              <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4 lg:grid-cols-7">
+              <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
                 <Stat
                   icon={Wallet}
                   label="Monthly Revenue"
@@ -371,62 +381,41 @@ export default function RiskDashboard() {
                       : ""
                   }${selected.profile.climate.rainfall_deviation_pct.toFixed(1)}%`}
                 />
-              </dl>
+              </div>
             </div>
 
-            {/* Document intelligence */}
-            <DocumentUploader
-              enterpriseId={selected.key}
-              onUploadSuccess={handleDocumentUploaded}
-            />
-            <DocumentInsightsCard
-              documents={documents}
-              loading={documentsLoading}
-              error={documentsError}
-            />
-
-            {/* Result area */}
-            {assessError && (
-              <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-6">
-                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
-                <div>
-                  <p className="text-sm font-semibold text-red-800">
-                    Risk assessment failed
-                  </p>
-                  <p className="mt-1 text-sm text-red-700">{assessError}</p>
-                </div>
-              </div>
-            )}
-
-            {assessing && !assessError && (
-              <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white p-16">
-                <Loader2 className="h-6 w-6 animate-spin text-emerald-500" />
-                <p className="text-sm text-slate-500">
-                  Gemini is reasoning over financial and climate signals...
-                </p>
-              </div>
-            )}
-
-            {!assessing && !assessError && !assessment && (
-              <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-slate-300 bg-white p-16 text-center">
-                <Sparkles className="h-6 w-6 text-slate-300" />
-                <p className="text-sm text-slate-500">
-                  Click &ldquo;Simulate API Call&rdquo; to run the GramOS XAI risk
-                  engine on this enterprise.
-                </p>
-              </div>
-            )}
-
-            {assessment && !assessing && (
-              <>
-                <RiskScoreWidget assessment={assessment} />
-
+            {/* Chart + risk score */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              <div className="lg:col-span-2">
                 <RiskChart
                   financials={selected.profile.financials}
                   climate={selected.profile.climate}
                   historyData={selected.history}
                 />
+              </div>
+              <RiskScorePanel
+                assessing={assessing}
+                assessError={assessError}
+                assessment={assessment}
+              />
+            </div>
 
+            {/* Document intelligence */}
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <DocumentUploader
+                enterpriseId={selected.key}
+                onUploadSuccess={handleDocumentUploaded}
+              />
+              <DocumentInsightsCard
+                documents={documents}
+                loading={documentsLoading}
+                error={documentsError}
+              />
+            </div>
+
+            {/* Assessment narrative */}
+            {assessment && !assessing && (
+              <>
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <SummaryCard
                     icon={Wallet}
@@ -440,8 +429,8 @@ export default function RiskDashboard() {
                   />
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-white p-6">
-                  <h2 className="text-sm font-semibold text-slate-900">
+                <div className="rounded-2xl border border-gray-700/60 bg-card p-6">
+                  <h2 className="text-sm font-semibold text-slate-50">
                     Actionable Mitigation Steps
                   </h2>
                   <ul className="mt-4 space-y-2">
@@ -452,18 +441,18 @@ export default function RiskDashboard() {
                           <button
                             type="button"
                             onClick={() => toggleStep(i)}
-                            className="flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition hover:bg-slate-50"
+                            className="flex w-full cursor-pointer items-start gap-3 rounded-lg px-3 py-2.5 text-left transition hover:bg-onyx"
                           >
                             {checked ? (
-                              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
+                              <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
                             ) : (
-                              <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-300" />
+                              <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-600" />
                             )}
                             <span
                               className={`text-sm leading-6 ${
                                 checked
-                                  ? "text-slate-400 line-through"
-                                  : "text-slate-700"
+                                  ? "text-slate-600 line-through"
+                                  : "text-slate-300"
                               }`}
                             >
                               {step}
@@ -493,12 +482,14 @@ function Stat({
   value: string;
 }) {
   return (
-    <div>
-      <dt className="flex items-center gap-1.5 text-xs text-slate-500">
-        <Icon className="h-3.5 w-3.5" />
+    <div className="rounded-xl border border-gray-700/60 bg-card p-4">
+      <div className="flex items-center gap-2 text-xs text-slate-500">
+        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-amber-400/10">
+          <Icon className="h-3.5 w-3.5 text-amber-400" />
+        </span>
         {label}
-      </dt>
-      <dd className="mt-1 text-lg font-semibold text-slate-900">{value}</dd>
+      </div>
+      <p className="mt-2 text-lg font-semibold text-slate-50">{value}</p>
     </div>
   );
 }
@@ -537,52 +528,52 @@ function DocumentInsightsCard({
   error: string | null;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6">
+    <div className="rounded-2xl border border-gray-700/60 bg-card p-6">
       <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
         Document Insights
       </h2>
 
       {loading && (
-        <div className="mt-4 flex items-center gap-2 text-sm text-slate-500">
+        <div className="mt-4 flex items-center gap-2 text-sm text-slate-400">
           <Loader2 className="h-4 w-4 animate-spin" />
           Loading documents...
         </div>
       )}
 
-      {error && !loading && <p className="mt-4 text-sm text-red-600">{error}</p>}
+      {error && !loading && <p className="mt-4 text-sm text-red-400">{error}</p>}
 
       {!loading && !error && documents.length === 0 && (
-        <p className="mt-4 text-sm text-slate-400">
+        <p className="mt-4 text-sm text-slate-500">
           No documents uploaded yet for this enterprise.
         </p>
       )}
 
       {!loading && !error && documents.length > 0 && (
-        <div className="mt-4 flex flex-col gap-4">
+        <div className="mt-4 flex max-h-96 flex-col gap-4 overflow-y-auto pr-1">
           {documents.map((doc) => (
             <div
               key={doc.id}
-              className="rounded-xl border border-slate-100 bg-slate-50 p-4"
+              className="rounded-xl border border-gray-700/60 bg-onyx p-4"
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500">
                   <FileText className="h-3.5 w-3.5" />
                   {doc.document_type}
                 </span>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-slate-500">
                   {new Date(doc.recorded_at).toLocaleString("en-IN")}
                 </span>
               </div>
-              <dl className="mt-3 grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
+              <dl className="mt-3 flex flex-col gap-2">
                 {Object.entries(doc.extracted_json).map(([key, value]) => (
                   <div
                     key={key}
-                    className="flex items-baseline justify-between gap-3 border-b border-slate-200 py-1"
+                    className="flex items-baseline justify-between gap-3 border-b border-gray-700/60 py-1"
                   >
                     <dt className="text-xs text-slate-500">
                       {formatFieldLabel(key)}
                     </dt>
-                    <dd className="text-right text-sm font-medium text-slate-900">
+                    <dd className="text-right text-sm font-medium text-slate-100">
                       {formatFieldValue(value)}
                     </dd>
                   </div>
@@ -606,23 +597,64 @@ function SummaryCard({
   body: string;
 }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6">
+    <div className="rounded-2xl border border-gray-700/60 bg-card p-6">
       <div className="flex items-center gap-2.5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-900">
-          <Icon className="h-4 w-4 text-emerald-500" />
+        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-amber-400/10">
+          <Icon className="h-4 w-4 text-amber-400" />
         </div>
-        <h2 className="text-sm font-semibold text-slate-900">{title}</h2>
+        <h2 className="text-sm font-semibold text-slate-50">{title}</h2>
       </div>
-      <p className="mt-4 text-sm leading-7 text-slate-600">{body}</p>
+      <p className="mt-4 text-sm leading-7 text-slate-400">{body}</p>
     </div>
   );
 }
 
-function RiskScoreWidget({
+/** Side-column panel that shows the loading / error / empty / result state of the
+ * Gemini risk assessment, alongside the always-available RiskChart. */
+function RiskScorePanel({
+  assessing,
+  assessError,
   assessment,
 }: {
-  assessment: RiskAssessmentResponse;
+  assessing: boolean;
+  assessError: string | null;
+  assessment: RiskAssessmentResponse | null;
 }) {
+  if (assessing) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-3 rounded-2xl border border-gray-700/60 bg-card p-8 text-center">
+        <Loader2 className="h-6 w-6 animate-spin text-amber-400" />
+        <p className="text-sm text-slate-400">
+          Gemini is reasoning over financial and climate signals...
+        </p>
+      </div>
+    );
+  }
+
+  if (assessError) {
+    return (
+      <div className="flex h-full flex-col items-start gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 p-6">
+        <AlertTriangle className="h-5 w-5 shrink-0 text-red-400" />
+        <p className="text-sm font-semibold text-red-300">
+          Risk assessment failed
+        </p>
+        <p className="text-sm text-red-400">{assessError}</p>
+      </div>
+    );
+  }
+
+  if (!assessment) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-gray-700 bg-card p-8 text-center">
+        <Sparkles className="h-6 w-6 text-slate-600" />
+        <p className="text-sm text-slate-500">
+          Click &ldquo;Simulate API Call&rdquo; to run the GramOS XAI risk
+          engine on this enterprise.
+        </p>
+      </div>
+    );
+  }
+
   const styles = RISK_STYLES[assessment.risk_classification];
   const radius = 54;
   const circumference = 2 * Math.PI * radius;
@@ -630,64 +662,57 @@ function RiskScoreWidget({
   const offset = circumference - (clampedScore / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center gap-6 rounded-2xl border border-slate-200 bg-white p-8 sm:flex-row sm:items-start sm:justify-between">
-      <div className="flex flex-col items-center gap-2">
-        <div className="relative h-36 w-36 shrink-0">
-          <svg viewBox="0 0 120 120" className="h-36 w-36 -rotate-90">
-            <circle
-              cx="60"
-              cy="60"
-              r={radius}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="10"
-              className="text-slate-100"
-            />
-            <circle
-              cx="60"
-              cy="60"
-              r={radius}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="10"
-              strokeLinecap="round"
-              strokeDasharray={circumference}
-              strokeDashoffset={offset}
-              className={`${styles.ring} transition-[stroke-dashoffset] duration-700 ease-out`}
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl font-bold text-slate-900">
-              {assessment.risk_score}
-            </span>
-            <span className="text-xs text-slate-400">/ 100</span>
-          </div>
-        </div>
-        {assessment.is_cached_fallback && (
-          <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-400">
-            <WifiOff className="h-3 w-3" />
-            Offline / Fallback Mode
+    <div className="flex h-full flex-col items-center gap-4 rounded-2xl border border-gray-700/60 bg-card p-6 text-center">
+      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+        NPA Risk Classification
+      </p>
+      <div className="relative h-32 w-32 shrink-0">
+        <svg viewBox="0 0 120 120" className="h-32 w-32 -rotate-90">
+          <circle
+            cx="60"
+            cy="60"
+            r={radius}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="10"
+            className="text-gray-700"
+          />
+          <circle
+            cx="60"
+            cy="60"
+            r={radius}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="10"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            className={`${styles.ring} transition-[stroke-dashoffset] duration-700 ease-out`}
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-3xl font-bold text-slate-50">
+            {assessment.risk_score}
           </span>
-        )}
-      </div>
-
-      <div className="flex flex-1 flex-col gap-3 text-center sm:text-left">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-            NPA Risk Classification
-          </p>
-          <span
-            className={`mt-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-semibold ${styles.badge}`}
-          >
-            <span className={`h-2 w-2 rounded-full ${styles.dot}`} />
-            {assessment.risk_classification}
-          </span>
+          <span className="text-xs text-slate-500">/ 100</span>
         </div>
-        <p className="text-sm text-slate-500">
-          Generated by the Gemini XAI risk engine, fusing transaction logs with
-          AlphaEarth climate metrics.
-        </p>
       </div>
+      <span
+        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-semibold ${styles.badge}`}
+      >
+        <span className={`h-2 w-2 rounded-full ${styles.dot}`} />
+        {assessment.risk_classification}
+      </span>
+      {assessment.is_cached_fallback && (
+        <span className="inline-flex items-center gap-1 rounded-full border border-gray-700 bg-onyx px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-500">
+          <WifiOff className="h-3 w-3" />
+          Offline / Fallback Mode
+        </span>
+      )}
+      <p className="text-xs leading-5 text-slate-500">
+        Generated by the Gemini XAI risk engine, fusing transaction logs with
+        AlphaEarth climate metrics.
+      </p>
     </div>
   );
 }

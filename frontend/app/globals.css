@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #121412;
+  --foreground: #f8fafc;
 }
 
 @theme inline {
@@ -10,6 +10,12 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* The Premium Crop palette. Borders/dividers and the interactive accent
+     already match Tailwind's stock gray-700 (#374151) and amber-400
+     (#FBBF24) exactly, so only the two surface tones need new tokens. */
+  --color-onyx: #121412;
+  --color-card: #1e221f;
 }
 
 body {
