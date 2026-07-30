@@ -1,6 +1,9 @@
+import json
 import os
 from typing import TypedDict
 
+from google import genai
+from google.genai import types as genai_types
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END
@@ -8,6 +11,18 @@ from langgraph.graph import StateGraph, START, END
 from models import RiskAssessmentRequest, RiskAssessmentResponse
 
 MODEL_NAME = "gemini-2.5-flash"
+
+DOCUMENT_EXTRACTION_PROMPT = """You are an expert credit underwriter at a rural development \
+finance institution, reviewing a document (bank statement, KCC passbook, invoice, receipt, land \
+record, or similar) submitted by a rural micro-enterprise loan applicant.
+
+Carefully read the document and extract every concrete underwriting-relevant data point you can \
+find: revenue or income figures, expenses, liabilities (loans, dues, overdrafts), assets (land, \
+equipment, livestock, inventory), account balances, and relevant dates.
+
+Return ONLY a JSON object mapping descriptive field names to their extracted values. Do not \
+include commentary, markdown, or explanation. If a category has no data in the document, omit it \
+rather than guessing."""
 
 CLIMATE_SYSTEM_PROMPT = """You are a climate risk analyst at a rural development finance \
 institution. Given NDVI (vegetation health), soil moisture, and rainfall deviation data for a \
@@ -53,6 +68,27 @@ def _build_llm(temperature: float = 0.2) -> ChatGoogleGenerativeAI:
             "GEMINI_API_KEY is not set. Add it to backend/.env (see .env.example)."
         )
     return ChatGoogleGenerativeAI(model=MODEL_NAME, google_api_key=api_key, temperature=temperature)
+
+
+async def extract_document_insights(file_bytes: bytes, mime_type: str) -> dict:
+    """Passes an uploaded document (image or PDF) to Gemini directly and returns the
+    underwriter-relevant fields it extracts, as a plain JSON-compatible dict."""
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise RuntimeError(
+            "GEMINI_API_KEY is not set. Add it to backend/.env (see .env.example)."
+        )
+
+    client = genai.Client(api_key=api_key)
+    response = await client.aio.models.generate_content(
+        model=MODEL_NAME,
+        contents=[
+            genai_types.Part.from_bytes(data=file_bytes, mime_type=mime_type),
+            DOCUMENT_EXTRACTION_PROMPT,
+        ],
+        config=genai_types.GenerateContentConfig(response_mime_type="application/json"),
+    )
+    return json.loads(response.text)
 
 
 async def analyze_climate(state: GraphState) -> dict:

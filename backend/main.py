@@ -1,23 +1,27 @@
 import asyncio
+import json
 import logging
 import os
 import random
+import uuid
+from datetime import datetime, timezone
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
 import jwt
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from google.genai import errors as genai_errors
 from langchain_google_genai.chat_models import ChatGoogleGenerativeAIError
 
 from database import get_supabase_client
-from engine import get_golden_fallback, risk_graph
+from engine import extract_document_insights, get_golden_fallback, risk_graph
 from models import (
     ClimateProfile,
+    DocumentInsight,
     FinancialProfile,
     HistoryPoint,
     RiskAssessmentRequest,
@@ -25,6 +29,17 @@ from models import (
 )
 
 HISTORY_DAYS = 30
+
+# Gemini's inline-data (non-Files-API) request limit is 20MB; images/PDFs are sent inline here.
+MAX_DOCUMENT_SIZE_BYTES = 20 * 1024 * 1024
+ALLOWED_DOCUMENT_MIME_TYPES = {
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/heic",
+    "image/heif",
+}
 
 logger = logging.getLogger("gramos")
 
@@ -233,3 +248,50 @@ async def assess_risk(request: RiskAssessmentRequest):
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Gemini risk analysis failed: {exc}") from exc
+
+
+@app.post(
+    "/api/enterprises/{enterprise_id}/upload-document",
+    response_model=DocumentInsight,
+    dependencies=[Depends(verify_jwt)],
+)
+async def upload_document(enterprise_id: str, file: UploadFile = File(...)):
+    client = get_supabase_client()
+
+    enterprise_res = client.table("enterprises").select("id").eq("id", enterprise_id).execute()
+    if not enterprise_res.data:
+        raise HTTPException(status_code=404, detail=f"Unknown enterprise '{enterprise_id}'")
+
+    if file.content_type not in ALLOWED_DOCUMENT_MIME_TYPES:
+        raise HTTPException(
+            status_code=415,
+            detail=f"Unsupported document type '{file.content_type}'. "
+            f"Allowed: {', '.join(sorted(ALLOWED_DOCUMENT_MIME_TYPES))}",
+        )
+
+    file_bytes = await file.read()
+    if not file_bytes:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty")
+    if len(file_bytes) > MAX_DOCUMENT_SIZE_BYTES:
+        raise HTTPException(status_code=413, detail="Document exceeds the 20MB limit")
+
+    try:
+        extracted = await extract_document_insights(file_bytes, file.content_type)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except (genai_errors.ClientError, genai_errors.ServerError) as exc:
+        raise HTTPException(status_code=502, detail=f"Gemini document extraction failed: {exc}") from exc
+    except json.JSONDecodeError as exc:
+        raise HTTPException(
+            status_code=502, detail=f"Gemini returned non-JSON output: {exc}"
+        ) from exc
+
+    row = {
+        "id": str(uuid.uuid4()),
+        "enterprise_id": enterprise_id,
+        "document_type": file.content_type,
+        "extracted_json": extracted,
+        "recorded_at": datetime.now(timezone.utc).isoformat(),
+    }
+    insert_res = client.table("document_insights").insert(row).execute()
+    return DocumentInsight.model_validate(insert_res.data[0])

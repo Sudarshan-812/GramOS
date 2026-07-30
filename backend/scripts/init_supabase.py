@@ -52,6 +52,14 @@ CREATE TABLE IF NOT EXISTS climate_snapshots (
     soil_moisture_percentage FLOAT NOT NULL,
     rainfall_deviation_pct FLOAT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS document_insights (
+    id UUID PRIMARY KEY,
+    enterprise_id UUID NOT NULL REFERENCES enterprises(id) ON DELETE CASCADE,
+    document_type TEXT NOT NULL,
+    extracted_json JSONB NOT NULL,
+    recorded_at TIMESTAMP NOT NULL DEFAULT now()
+);
 """
 
 
@@ -69,7 +77,7 @@ def create_schema() -> None:
         with conn:
             with conn.cursor() as cur:
                 cur.execute(SCHEMA_SQL)
-        print("Schema ready: enterprises, financial_ledgers, climate_snapshots")
+        print("Schema ready: enterprises, financial_ledgers, climate_snapshots, document_insights")
     finally:
         conn.close()
 

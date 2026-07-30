@@ -88,3 +88,13 @@ class HistoryPoint(BaseModel):
     recorded_at: datetime
     monthly_revenue_inr: float
     ndvi_index: float
+
+
+class DocumentInsight(BaseModel):
+    id: UUID
+    enterprise_id: UUID
+    document_type: str = Field(..., description="MIME type of the uploaded document")
+    extracted_json: dict = Field(
+        ..., description="Underwriting-relevant fields Gemini extracted from the document"
+    )
+    recorded_at: datetime
