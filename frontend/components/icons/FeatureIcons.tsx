@@ -2,7 +2,7 @@ interface IconProps {
   className?: string;
 }
 
-/** "arrows_more_up" — ascending step arrows, for cash flow forecasting. Floats gently. */
+/** "arrows_more_up": ascending step arrows, for cash flow forecasting. Floats gently. */
 export function ForecastIcon({ className }: IconProps) {
   return (
     <svg
@@ -16,7 +16,7 @@ export function ForecastIcon({ className }: IconProps) {
   );
 }
 
-/** "auto_awesome" — sparkle cluster, for the XAI / Gemini-generated explanations. Twinkles
+/** "auto_awesome": sparkle cluster, for the XAI / Gemini-generated explanations. Twinkles
  * with each shape offset so they don't pulse in unison. */
 export function AIIcon({ className }: IconProps) {
   return (
@@ -44,7 +44,7 @@ export function AIIcon({ className }: IconProps) {
   );
 }
 
-/** "public" — globe, for satellite climate monitoring. Rotates slowly, like a live feed. */
+/** "public": globe, for satellite climate monitoring. Rotates slowly, like a live feed. */
 export function GlobeIcon({ className }: IconProps) {
   return (
     <svg

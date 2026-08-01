@@ -83,7 +83,7 @@ export async function uploadDocument(
     `${API_BASE_URL}/api/enterprises/${enterpriseId}/upload-document`,
     {
       method: "POST",
-      // Do not set Content-Type here — the browser must set it (with the
+      // Do not set Content-Type here: the browser must set it (with the
       // multipart boundary) itself when the body is a FormData instance.
       headers: await authHeaders(),
       body: formData,

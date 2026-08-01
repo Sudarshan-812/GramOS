@@ -81,7 +81,7 @@ class ClimateSnapshot(BaseModel):
 
 
 class HistoryPoint(BaseModel):
-    """One day of GET /api/enterprises/{id}/history — a financial_ledgers row joined with its
+    """One day of GET /api/enterprises/{id}/history: a financial_ledgers row joined with its
     same-day climate_snapshots row, reduced to just the fields the dashboard's time-series
     chart plots."""
 

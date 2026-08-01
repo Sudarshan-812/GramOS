@@ -110,7 +110,7 @@ export default function DocumentUploader({
               Drag &amp; drop a file here, or click to browse
             </p>
             <p className="text-xs text-slate-500">
-              PDF, JPEG, PNG, WEBP, HEIC — up to 20MB
+              PDF, JPEG, PNG, WEBP, HEIC (up to 20MB)
             </p>
           </>
         )}

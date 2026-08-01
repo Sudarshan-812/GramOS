@@ -255,14 +255,14 @@ async def assess_risk(request: RiskAssessmentRequest):
         return result["final_assessment"]
     except asyncio.TimeoutError:
         logger.warning(
-            "assess-risk timed out after %.1fs for '%s' — serving golden fallback",
+            "assess-risk timed out after %.1fs for '%s', serving golden fallback",
             ASSESS_RISK_TIMEOUT_SECONDS,
             request.enterprise_name,
         )
         return get_golden_fallback(request.enterprise_name)
     except (genai_errors.ClientError, genai_errors.ServerError, ChatGoogleGenerativeAIError) as exc:
         logger.warning(
-            "assess-risk hit a Gemini API error (%s) for '%s' — serving golden fallback",
+            "assess-risk hit a Gemini API error (%s) for '%s', serving golden fallback",
             exc,
             request.enterprise_name,
         )

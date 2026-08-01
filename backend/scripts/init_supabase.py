@@ -86,7 +86,7 @@ def create_schema() -> None:
     db_url = os.getenv("DATABASE_URL")
     if not db_url:
         raise RuntimeError(
-            "DATABASE_URL is not set. Add it to backend/.env (see .env.example) — this is "
+            "DATABASE_URL is not set. Add it to backend/.env (see .env.example); this is "
             "the direct Postgres connection string from Project Settings -> Database -> "
             "Connection string, required because the Supabase REST client cannot run DDL."
         )
@@ -159,7 +159,7 @@ def seed_mock_enterprises() -> None:
 def main() -> None:
     create_schema()
     seed_mock_enterprises()
-    print("Supabase connection verified — schema created and seeded successfully.")
+    print("Supabase connection verified: schema created and seeded successfully.")
 
 
 if __name__ == "__main__":

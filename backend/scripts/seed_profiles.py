@@ -1,7 +1,7 @@
 """The 3 core enterprise profiles used to bootstrap and backfill Supabase.
 
 Moved out of the old backend/mock_data.py when the live API (main.py) was rewired to read
-from Supabase instead of in-memory mock data — this module is now seed-tooling only, used by
+from Supabase instead of in-memory mock data; this module is now seed-tooling only, used by
 init_supabase.py and seed_dynamic_data.py, and is not imported anywhere in the live app.
 """
 
@@ -19,7 +19,7 @@ def dairy_cooperative_fodder_shortage() -> RiskAssessmentRequest:
     """A village dairy cooperative mid-way through a regional fodder shortage.
 
     Repayment history still looks clean (0 days past due), but climate signals
-    are deteriorating fast — this is the canonical case for climate-forward
+    are deteriorating fast; this is the canonical case for climate-forward
     risk flagging that lagging financial data alone would miss.
     """
     return RiskAssessmentRequest(

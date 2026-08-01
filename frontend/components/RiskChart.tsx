@@ -77,7 +77,7 @@ const MODE_META: Record<ChartMode, { title: string; subtitle: string }> = {
   radar: {
     title: "Composite Risk Profile",
     subtitle:
-      "Normalized 0–100 health score across financial and climate signals — a fuller shape means lower risk.",
+      "Normalized 0–100 health score across financial and climate signals; a fuller shape means lower risk.",
   },
 };
 
@@ -513,7 +513,7 @@ function LineView({ financials, climate, historyData }: RiskChartProps) {
             <tr key={point.dayOffset}>
               <td>{formatDayOffset(point.dayOffset)}</td>
               <td>{formatINRFull(point.actual ?? point.projected ?? 0)}</td>
-              <td>{point.ndviActual != null ? point.ndviActual.toFixed(2) : "—"}</td>
+              <td>{point.ndviActual != null ? point.ndviActual.toFixed(2) : "N/A"}</td>
               <td>{point.actual != null ? "Actual" : "Projected"}</td>
             </tr>
           ))}

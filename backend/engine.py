@@ -29,7 +29,7 @@ institution. Given NDVI (vegetation health), soil moisture, and rainfall deviati
 rural micro-enterprise, reason about how the physical environment underpinning the enterprise's \
 revenue (crop yield, fodder availability, water access) is trending, and how that plausibly \
 threatens FUTURE cash flow for this specific business type. Weight deterioration heavily even if \
-the enterprise's repayment record currently looks clean — you are assessing forward climate risk. \
+the enterprise's repayment record currently looks clean; you are assessing forward climate risk. \
 Respond with a concise analytical paragraph. Do not invent a risk score or classification."""
 
 FINANCIAL_SYSTEM_PROMPT = """You are a credit analyst at a rural development finance institution. \
@@ -44,13 +44,13 @@ development finance institution, producing the final institutional-grade Non-Per
 
 A deterministic risk score has already been calculated by a separate, auditable math model, as \
 required by RBI 2026 Model Risk Management guidelines. You MUST NOT recalculate, override, or \
-second-guess this score — copy it exactly into risk_score, and derive risk_classification from it \
+second-guess this score; copy it exactly into risk_score, and derive risk_classification from it \
 using these bands: LOW (0-24), MEDIUM (25-49), HIGH (50-74), CRITICAL (75-100).
 
 Your job is to write the explainable narrative: financial_health_summary, climate_risk_impact, \
 and actionable_mitigation_steps, grounded in the financial analysis and climate analysis you are \
 given below. Focus entirely on producing clear, well-reasoned prose and concrete mitigation \
-actions — the numeric score is not yours to compute."""
+actions; the numeric score is not yours to compute."""
 
 
 class GraphState(TypedDict):
@@ -156,7 +156,7 @@ FINANCIAL ANALYSIS:
 CLIMATE ANALYSIS:
 {state["climate_analysis"]}
 
-DETERMINISTIC RISK SCORE (calculated by an auditable math model — use this exact value as \
+DETERMINISTIC RISK SCORE (calculated by an auditable math model; use this exact value as \
 risk_score, do not recompute it): {state["deterministic_score"]}
 
 Produce the full structured risk assessment now."""

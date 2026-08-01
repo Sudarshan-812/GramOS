@@ -2,7 +2,7 @@
 
 **The AI operating system for rural financial intelligence.**
 
-GramOS is a B2B risk-intelligence platform for rural micro-enterprise lending. It fuses alternative transaction data with satellite-derived climate signals, reasons over both with Gemini in a multi-agent pipeline, and gives loan officers an explainable, auditable NPA (non-performing asset) risk score — weeks before a missed payment would otherwise flag it.
+GramOS is a B2B risk-intelligence platform for rural micro-enterprise lending. It fuses alternative transaction data with satellite-derived climate signals, reasons over both with Gemini in a multi-agent pipeline, and gives loan officers an explainable, auditable NPA (non-performing asset) risk score, weeks before a missed payment would otherwise flag it.
 
 Built for the Google DeepMind "AI for the Planet" Accelerator.
 
@@ -17,26 +17,26 @@ Legacy credit scoring for rural micro-enterprises (dairy cooperatives, agri-inpu
 - Blind to climate and weather shocks that erode repayment ability
 - Risk is only flagged *after* a payment is missed
 
-GramOS fuses structured transaction data with real-time earth observation, reasons over both with an LLM, and surfaces risk **before** it shows up in repayment history — with every score fully explainable and every human override logged for compliance.
+GramOS fuses structured transaction data with real-time earth observation, reasons over both with an LLM, and surfaces risk **before** it shows up in repayment history, with every score fully explainable and every human override logged for compliance.
 
 ## What's built
 
-- **Explainable multi-agent risk engine** — a LangGraph pipeline runs a financial-health agent and a climate-risk agent in parallel over Gemini, combines their output with a separate deterministic scoring model (auditable, not LLM-generated — RBI Model Risk Management-aligned), and synthesizes a final narrative: risk score, classification, financial summary, climate impact, and concrete mitigation steps.
-- **Document intelligence** — loan officers upload bank statements, KCC passbooks, or invoices (PDF/image); Gemini's multimodal API extracts underwriting-relevant figures directly from the document into structured JSON, no OCR pipeline required.
-- **Human-in-the-loop override with audit trail** — any AI-generated score can be manually overridden by a loan officer with a mandatory justification. The override, the original score, and the officer's identity (from their verified session) are written to an immutable audit log.
-- **Proactive risk alerting** — a background scheduler polls every enterprise's latest climate snapshot on an interval and raises a warning the moment NDVI or soil moisture crosses a drought threshold, rather than waiting for someone to check.
-- **Multi-view analytics dashboard** — cash flow trend, projected revenue, and a composite risk-profile radar, switchable per enterprise, backed by a real Supabase time series.
-- **Authentication & route protection** — Supabase Auth (JWT, verified server-side against Supabase's JWKS) gates both the dashboard and every API route.
+- **Explainable multi-agent risk engine**: a LangGraph pipeline runs a financial-health agent and a climate-risk agent in parallel over Gemini, combines their output with a separate deterministic scoring model (auditable, not LLM-generated; RBI Model Risk Management-aligned), and synthesizes a final narrative: risk score, classification, financial summary, climate impact, and concrete mitigation steps.
+- **Document intelligence**: loan officers upload bank statements, KCC passbooks, or invoices (PDF/image); Gemini's multimodal API extracts underwriting-relevant figures directly from the document into structured JSON, no OCR pipeline required.
+- **Human-in-the-loop override with audit trail**: any AI-generated score can be manually overridden by a loan officer with a mandatory justification. The override, the original score, and the officer's identity (from their verified session) are written to an immutable audit log.
+- **Proactive risk alerting**: a background scheduler polls every enterprise's latest climate snapshot on an interval and raises a warning the moment NDVI or soil moisture crosses a drought threshold, rather than waiting for someone to check.
+- **Multi-view analytics dashboard**: cash flow trend, projected revenue, and a composite risk-profile radar, switchable per enterprise, backed by a real Supabase time series.
+- **Authentication & route protection**: Supabase Auth (JWT, verified server-side against Supabase's JWKS) gates both the dashboard and every API route.
 
 ## Current status
 
-This is a working prototype, not a production deployment. Three mock enterprises are seeded with real backend logic running end-to-end; AlphaEarth satellite ingestion is stubbed with deterministic synthetic values pending live integration, and financial history is backfilled synthetic data anchored to each enterprise's profile. Everything else — auth, the risk engine, document extraction, the audit trail, and alerting — runs against a real Supabase instance and real Gemini calls.
+This is a working prototype, not a production deployment. Three mock enterprises are seeded with real backend logic running end-to-end; AlphaEarth satellite ingestion is stubbed with deterministic synthetic values pending live integration, and financial history is backfilled synthetic data anchored to each enterprise's profile. Everything else (auth, the risk engine, document extraction, the audit trail, and alerting) runs against a real Supabase instance and real Gemini calls.
 
 ---
 
 ## Architecture
 
-Monorepo with two independently run apps, no shared package layer — the frontend talks to the backend over HTTP.
+Monorepo with two independently run apps, no shared package layer; the frontend talks to the backend over HTTP.
 
 ```
 GramOS/
@@ -64,7 +64,7 @@ GramOS/
 | Frontend | Next.js 16 (App Router, TypeScript), Tailwind CSS v4, Recharts, `lucide-react` |
 | Backend | FastAPI, Python 3.13, Uvicorn, Pydantic v2 |
 | AI / XAI | Gemini 2.5 Flash via the `google-genai` SDK, orchestrated with LangGraph (`langchain-google-genai`) |
-| Auth | Supabase Auth — JWT verified server-side against the project's JWKS (asymmetric signing keys) |
+| Auth | Supabase Auth, JWT verified server-side against the project's JWKS (asymmetric signing keys) |
 | Database | Supabase Postgres via `supabase-py` (REST) for the live app; direct `psycopg2` for one-off schema DDL |
 | Scheduling | APScheduler (`AsyncIOScheduler`), run inside the FastAPI lifespan |
 | Geospatial | Google AlphaEarth satellite climate data (NDVI, soil moisture, rainfall deviation) |
@@ -123,7 +123,7 @@ python scripts/seed_dynamic_data.py
 uvicorn main:app --reload --port 8000
 ```
 
-A loan officer account is created directly in Supabase Auth (Authentication → Users → Add user) — there is no self-serve signup flow.
+A loan officer account is created directly in Supabase Auth (Authentication → Users → Add user); there is no self-serve signup flow.
 
 ### 3. Set up the frontend
 
@@ -155,4 +155,4 @@ All routes except `GET /` require a Supabase-issued bearer token.
 
 ## License
 
-Proprietary — built for the Google DeepMind "AI for the Planet" Accelerator.
+Proprietary, built for the Google DeepMind "AI for the Planet" Accelerator.

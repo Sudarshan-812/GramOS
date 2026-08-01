@@ -18,7 +18,7 @@ const features = [
     icon: ForecastIcon,
     title: "Agentic Cash Flow Forecasting",
     description:
-      "Autonomous agents continuously model income volatility from transaction history, seasonal cycles, and local demand — surfacing liquidity gaps weeks before they hit.",
+      "Autonomous agents continuously model income volatility from transaction history, seasonal cycles, and local demand, surfacing liquidity gaps weeks before they hit.",
   },
   {
     icon: AIIcon,
@@ -239,7 +239,7 @@ export default function Home() {
             </h2>
             <p className="mt-4 max-w-xl text-lg text-slate-400">
               Book a walkthrough with our team and bring your own transaction
-              sample — we&rsquo;ll show you the explainable risk output live.
+              sample, and we&rsquo;ll show you the explainable risk output live.
             </p>
             <a
               href="mailto:demo@gramos.ai"

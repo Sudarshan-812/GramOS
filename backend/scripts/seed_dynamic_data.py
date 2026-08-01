@@ -59,7 +59,7 @@ def add_time_series_columns() -> None:
     db_url = os.getenv("DATABASE_URL")
     if not db_url:
         raise RuntimeError(
-            "DATABASE_URL is not set. Add it to backend/.env (see .env.example) — required to "
+            "DATABASE_URL is not set. Add it to backend/.env (see .env.example); required to "
             "add the recorded_at column via a direct Postgres connection."
         )
     conn = psycopg2.connect(db_url)
@@ -101,7 +101,7 @@ def mean_reverting_walk(anchor: float, days: int, noise_std: float, theta: float
 
 
 def generate_climate_series(is_dairy: bool, anchor) -> list[dict]:
-    """anchor is a ClimateProfile — today's already-known values from mock_data."""
+    """anchor is a ClimateProfile: today's already-known values from mock_data."""
     if is_dairy:
         # Force a steady drought trend: healthier 30 days ago, declining to today's known bad state.
         ndvi = declining_trend(0.60, anchor.ndvi_index, BACKFILL_DAYS, noise_std=0.015, lo=0.0, hi=1.0)
@@ -118,7 +118,7 @@ def generate_climate_series(is_dairy: bool, anchor) -> list[dict]:
     ]
 
 
-# (txn_count_range, ticket_size_range) — daily UPI transaction volume and average ticket size
+# (txn_count_range, ticket_size_range): daily UPI transaction volume and average ticket size
 # vary by business type, roughly centered on each enterprise's known mock_data figures.
 FINANCIAL_PROFILES_BY_TYPE = {
     "dairy cooperative": {"txn_count": (370, 450), "ticket_size": (400.0, 500.0)},
@@ -129,7 +129,7 @@ DEFAULT_FINANCIAL_PROFILE = {"txn_count": (150, 400), "ticket_size": (500.0, 900
 
 
 def generate_financial_series(business_type: str, is_dairy: bool, is_handloom: bool, anchor) -> list[dict]:
-    """anchor is a FinancialProfile — today's already-known values from mock_data."""
+    """anchor is a FinancialProfile: today's already-known values from mock_data."""
     cfg = FINANCIAL_PROFILES_BY_TYPE.get(business_type.lower(), DEFAULT_FINANCIAL_PROFILE)
 
     txn_counts = [random.randint(*cfg["txn_count"]) for _ in range(BACKFILL_DAYS)]
@@ -182,7 +182,7 @@ def backfill() -> None:
     for ent in enterprises:
         profile = mock_by_name.get(ent["name"])
         if profile is None:
-            print(f"Skipping '{ent['name']}' — no matching mock_data profile to anchor against.")
+            print(f"Skipping '{ent['name']}': no matching mock_data profile to anchor against.")
             continue
 
         is_dairy = "dairy" in ent["business_type"].lower()
