@@ -4,7 +4,7 @@ B2B AI-driven cash flow prediction and risk-flagging system for rural micro ente
 
 ## Tech Stack
 
-- **Frontend**: Next.js (App Router, TypeScript, Tailwind CSS), `lucide-react` for icons
+- **Frontend**: Next.js (App Router, TypeScript, Tailwind CSS). Icons are hand-ported React components in `frontend/components/icons/` (`MaterialIcons.tsx`, `FeatureIcons.tsx`), each path sourced verbatim from the official [google/material-design-icons](https://github.com/google/material-design-icons) repo (`materialiconsoutlined`, 24px) — not a generic icon library
   - Note: `npx create-next-app@latest` currently installs Next.js 16 / React 19, not Next.js 14. `frontend/AGENTS.md` warns this version has breaking changes vs. older Next.js conventions: check `frontend/node_modules/next/dist/docs/` before relying on training-data assumptions about App Router APIs.
 - **Backend**: FastAPI (Python 3.13), Uvicorn, Pydantic v2
 - **AI / XAI**: Gemini API via the `google-genai` SDK (not the deprecated `google-generativeai` package) for explainable risk reasoning, using structured outputs (`response_schema`) to guarantee JSON matching `RiskAssessmentResponse`

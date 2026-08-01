@@ -6,7 +6,7 @@ import {
   BarChart3 as BarChartIcon,
   LineChart as LineChartIcon,
   Radar as RadarIcon,
-} from "lucide-react";
+} from "@/components/icons/MaterialIcons";
 import {
   Area,
   AreaChart,

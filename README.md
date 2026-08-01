@@ -61,7 +61,7 @@ GramOS/
 
 | Layer | Technology |
 |---|---|
-| Frontend | Next.js 16 (App Router, TypeScript), Tailwind CSS v4, Recharts, `lucide-react` |
+| Frontend | Next.js 16 (App Router, TypeScript), Tailwind CSS v4, Recharts, icons ported from [google/material-design-icons](https://github.com/google/material-design-icons) |
 | Backend | FastAPI, Python 3.13, Uvicorn, Pydantic v2 |
 | AI / XAI | Gemini 2.5 Flash via the `google-genai` SDK, orchestrated with LangGraph (`langchain-google-genai`) |
 | Auth | Supabase Auth, JWT verified server-side against the project's JWKS (asymmetric signing keys) |

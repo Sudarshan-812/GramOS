@@ -8,7 +8,7 @@ import {
   ClipboardList,
   Landmark,
   CheckCircle2,
-} from "lucide-react";
+} from "@/components/icons/MaterialIcons";
 import Footer from "@/components/Footer";
 import { AIIcon, ForecastIcon, GlobeIcon } from "@/components/icons/FeatureIcons";
 import Navbar from "@/components/Navbar";

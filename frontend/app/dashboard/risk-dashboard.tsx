@@ -19,7 +19,7 @@ import {
   TrendingUp,
   Wallet,
   WifiOff,
-} from "lucide-react";
+} from "@/components/icons/MaterialIcons";
 import Image from "next/image";
 import DocumentUploader from "@/components/DocumentUploader";
 import OverrideScoreModal from "@/components/OverrideScoreModal";

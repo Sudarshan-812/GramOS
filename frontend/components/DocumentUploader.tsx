@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Loader2, UploadCloud } from "lucide-react";
+import { AlertTriangle, Loader2, UploadCloud } from "@/components/icons/MaterialIcons";
 import { type DragEvent, useRef, useState } from "react";
 import { uploadDocument } from "@/lib/api";
 import type { DocumentInsight } from "@/lib/types";

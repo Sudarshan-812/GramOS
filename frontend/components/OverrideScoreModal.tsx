@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Loader2, X } from "lucide-react";
+import { AlertTriangle, Loader2, X } from "@/components/icons/MaterialIcons";
 import { type FormEvent, useEffect, useState } from "react";
 import { overrideScore } from "@/lib/api";
 import type { AuditLog } from "@/lib/types";
