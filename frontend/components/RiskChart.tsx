@@ -71,13 +71,18 @@ function clamp(value: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, value));
 }
 
-function formatDayOffset(value: number): string {
+function formatDayOffset(value: number | null | undefined): string {
+  if (value == null) return "";
   if (value === 0) return "Today";
   if (value < 0) return `D${value}`;
   return `M+${Math.round(value / DAYS_PER_MONTH)}`;
 }
 
-function formatINR(value: number): string {
+// ApexCharts' axis/tooltip formatters get called with the raw value at a given
+// x-position, which is `null` wherever a series has a gap (e.g. the historical
+// vs. projected split) — so these must tolerate null/undefined, not just number.
+function formatINR(value: number | null | undefined): string {
+  if (value == null) return "";
   if (value >= 100_000) return `₹${(value / 100_000).toFixed(1)}L`;
   if (value >= 1_000) return `₹${(value / 1_000).toFixed(0)}K`;
   return `₹${value.toFixed(0)}`;
@@ -351,7 +356,7 @@ function LineView({ financials, climate, historyData }: RiskChartProps) {
                 max: 1,
                 tickAmount: 4,
                 labels: {
-                  formatter: (v: number) => v.toFixed(2),
+                  formatter: (v: number | null | undefined) => (v == null ? "" : v.toFixed(2)),
                   style: { colors: COLORS.muted, fontSize: "12px" },
                 },
               },
