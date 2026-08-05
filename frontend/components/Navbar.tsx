@@ -20,13 +20,17 @@ export default function Navbar() {
   }, []);
 
   return (
-    <div className="sticky top-0 z-50 flex justify-center px-4 pt-4">
+    <div
+      className="sticky top-0 z-50 flex justify-center px-4 transition-[padding-top] duration-[600ms] ease-in-out"
+      style={{ paddingTop: scrolled ? "0.5rem" : "1rem" }}
+    >
       <nav
-        className={`flex w-full max-w-5xl items-center justify-between rounded-full px-5 py-2.5 transition-all duration-300 ${
+        className={`flex w-full items-center justify-between rounded-full px-5 py-2.5 transition-all duration-[600ms] ease-in-out ${
           scrolled
             ? "border border-black/5 bg-white/90 shadow-[0_8px_30px_-12px_rgba(18,20,18,0.15)] backdrop-blur-md"
             : "border border-transparent bg-white/40 backdrop-blur-sm"
         }`}
+        style={{ maxWidth: scrolled ? "50rem" : "64rem" }}
       >
         <a href="#top" className="flex cursor-pointer items-center gap-2">
           <Image
