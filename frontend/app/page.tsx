@@ -65,12 +65,12 @@ export default function Home() {
         {/* Hero */}
         <section className="relative overflow-hidden">
           <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center px-6 py-20 text-center lg:px-8 lg:py-28">
-            <span className="animate-rise inline-flex items-center rounded-full border border-black/10 bg-white px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-onyx/50 shadow-sm">
+            <span className="animate-rise inline-flex items-center rounded-full border border-black/10 bg-white px-4 py-1.5 text-xs font-medium uppercase tracking-[0.16em] text-onyx/40 shadow-sm">
               Built for rural credit risk
             </span>
 
             <h1
-              className="animate-rise mt-6 max-w-2xl text-balance text-4xl font-semibold leading-[1.35] tracking-tight text-onyx sm:text-5xl sm:leading-[1.3]"
+              className="animate-rise mt-6 max-w-2xl text-balance text-4xl font-normal leading-[1.2] tracking-[-0.03em] text-onyx sm:text-5xl sm:leading-[1.15]"
               style={{ animationDelay: "0.08s" }}
             >
               The AI Operating System for{" "}
