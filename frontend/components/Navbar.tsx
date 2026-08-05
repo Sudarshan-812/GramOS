@@ -1,4 +1,8 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const NAV_LINKS = [
   { href: "#architecture", label: "Architecture" },
@@ -6,9 +10,24 @@ const NAV_LINKS = [
 ];
 
 export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-700/60 bg-onyx/90 backdrop-blur">
-      <nav className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-2.5 lg:px-8">
+    <div className="sticky top-0 z-50 flex justify-center px-4 pt-4">
+      <nav
+        className={`flex w-full max-w-5xl items-center justify-between rounded-full px-5 py-2.5 transition-all duration-300 ${
+          scrolled
+            ? "border border-black/5 bg-white/90 shadow-[0_8px_30px_-12px_rgba(18,20,18,0.15)] backdrop-blur-md"
+            : "border border-transparent bg-white/40 backdrop-blur-sm"
+        }`}
+      >
         <a href="#top" className="flex cursor-pointer items-center gap-2">
           <Image
             src="/GramOStpt.png"
@@ -18,30 +37,38 @@ export default function Navbar() {
             className="h-6 w-6"
             priority
           />
-          <span className="text-sm font-semibold tracking-tight text-slate-50">
+          <span className="text-sm font-semibold tracking-tight text-onyx">
             GramOS
           </span>
         </a>
 
-        <div className="hidden items-center gap-6 text-sm text-slate-400 md:flex">
+        <div className="hidden items-center gap-7 text-sm text-onyx/60 md:flex">
           {NAV_LINKS.map(({ href, label }) => (
             <a
               key={href}
               href={href}
-              className="cursor-pointer transition hover:text-slate-50"
+              className="cursor-pointer transition hover:text-onyx"
             >
               {label}
             </a>
           ))}
         </div>
 
-        <a
-          href="#demo"
-          className="inline-flex cursor-pointer items-center rounded-full bg-amber-400 px-4 py-1.5 text-sm font-semibold text-onyx transition hover:bg-amber-300"
-        >
-          Request Demo
-        </a>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/login"
+            className="hidden cursor-pointer text-sm font-medium text-onyx/70 transition hover:text-onyx sm:block"
+          >
+            Login
+          </Link>
+          <a
+            href="#demo"
+            className="inline-flex cursor-pointer items-center gap-1 rounded-full bg-lime-300 px-4 py-1.5 text-sm font-semibold text-onyx transition hover:bg-lime-200"
+          >
+            Request Demo
+          </a>
+        </div>
       </nav>
-    </header>
+    </div>
   );
 }

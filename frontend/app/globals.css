@@ -11,21 +11,34 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* The Premium Crop palette. Borders/dividers and the interactive accent
-     already match Tailwind's stock gray-700 (#374151) and amber-400
-     (#FBBF24) exactly, so only the two surface tones need new tokens. */
+  /* The Premium Crop palette (dashboard/login — authenticated app stays
+     dark). Borders/dividers already match Tailwind's stock gray-700
+     (#374151) exactly, so only the two surface tones need tokens. */
   --color-onyx: #121412;
   --color-card: #1e221f;
+
+  /* Light + Lime palette, landing page only (app/page.tsx, Navbar, Footer).
+     Kept as separate tokens rather than repurposing --background/--color-card
+     so the authenticated dashboard/login pages (bg-onyx + bg-card, white
+     text) aren't affected. The lime accent uses Tailwind's stock
+     lime-300/400/600 utilities directly, same as amber-400 was used
+     directly before. */
+  --color-paper: #fafaf6;
+  --color-mist: #f3f3ee;
 
   /* Feature-icon animations (components/icons/FeatureIcons.tsx) */
   --animate-float: float 3s ease-in-out infinite;
   --animate-twinkle: twinkle 1.8s ease-in-out infinite;
   --animate-spin-slow: spin-slow 10s linear infinite;
 
-  /* Hero signature animation: a slow-drifting aurora glow + a one-time
-     entrance for the headline/subhead/CTA stack. */
+  /* Hero signature animation: a slow-drifting glow + a one-time entrance
+     for the headline/subhead/CTA stack. */
   --animate-aurora: aurora 18s ease-in-out infinite;
   --animate-rise: rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  /* Background "chakra" — a large, slow-rotating ring motif used as an
+     ambient decorative layer (see the Chakra component in page.tsx). */
+  --animate-spin-slower: spin-slow 70s linear infinite;
 }
 
 @keyframes float {

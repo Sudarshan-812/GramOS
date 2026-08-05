@@ -49,42 +49,38 @@ const gramosPoints = [
 ];
 
 const stats = [
-  { value: "30+ days", label: "Earlier risk detection" },
-  { value: "BigQuery + AlphaEarth", label: "Data sources fused" },
-  { value: "Explainable", label: "Every score, by Gemini" },
+  { value: "30+ days", label: "Earlier detection" },
+  { value: "2 sources", label: "BigQuery + AlphaEarth" },
+  { value: "100%", label: "Explainable by Gemini" },
 ];
 
 export default function Home() {
   return (
-    <div id="top" className="flex flex-1 flex-col bg-onyx text-slate-50">
+    <div id="top" className="flex flex-1 flex-col bg-paper text-onyx">
       <Navbar />
 
       <main className="flex-1">
         {/* Hero */}
         <section className="relative overflow-hidden">
-          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="animate-aurora absolute left-1/2 top-[-12%] h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-amber-400/20 blur-[130px]" />
-            <div
-              className="animate-aurora absolute right-[8%] top-[26%] h-[22rem] w-[22rem] rounded-full bg-amber-300/10 blur-[110px]"
-              style={{ animationDelay: "-9s" }}
-            />
-          </div>
+          <Chakra />
 
-          <div className="relative mx-auto flex w-full max-w-5xl flex-col items-center px-6 py-32 text-center lg:px-8 lg:py-44">
-            <span className="animate-rise inline-flex items-center rounded-full border border-gray-800 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-slate-400">
+          <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center px-6 py-20 text-center lg:px-8 lg:py-28">
+            <span className="animate-rise inline-flex items-center rounded-full border border-black/10 bg-white px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-onyx/50 shadow-sm">
               Built for rural credit risk
             </span>
 
             <h1
-              className="animate-rise mt-8 max-w-4xl text-balance text-5xl font-semibold tracking-tight text-slate-50 sm:text-6xl lg:text-7xl"
+              className="animate-rise mt-6 max-w-2xl text-balance text-4xl font-semibold tracking-tight text-onyx sm:text-5xl"
               style={{ animationDelay: "0.08s" }}
             >
               The AI Operating System for{" "}
-              <span className="text-amber-400">Rural Financial Intelligence</span>
+              <span className="rounded-lg bg-lime-300 px-2 py-0.5">
+                Rural Financial Intelligence
+              </span>
             </h1>
 
             <p
-              className="animate-rise mt-8 max-w-xl text-pretty text-lg font-light leading-8 text-slate-400"
+              className="animate-rise mt-6 max-w-lg text-pretty text-base leading-7 text-onyx/60 sm:text-lg"
               style={{ animationDelay: "0.16s" }}
             >
               Predict NPA risk before it happens using climate satellite data
@@ -92,36 +88,39 @@ export default function Home() {
             </p>
 
             <div
-              className="animate-rise mt-12 flex flex-col items-center gap-6 sm:flex-row"
+              className="animate-rise mt-8 flex flex-col items-center gap-5 sm:flex-row"
               style={{ animationDelay: "0.24s" }}
             >
               <a
                 href="#demo"
-                className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-amber-400 px-7 py-3.5 text-sm font-semibold text-onyx transition hover:bg-amber-300"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-lime-300 px-6 py-3 text-sm font-semibold text-onyx shadow-sm transition hover:-translate-y-0.5 hover:bg-lime-200 hover:shadow-md"
               >
                 Request Demo
                 <ArrowRight className="h-4 w-4" />
               </a>
               <a
                 href="#architecture"
-                className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-slate-300 transition hover:text-amber-400"
+                className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-onyx/70 transition hover:text-onyx"
               >
                 See how it works
                 <ArrowRight className="h-3.5 w-3.5" />
               </a>
             </div>
 
-            {/* Stat strip */}
+            {/* Stat cards */}
             <dl
-              className="animate-rise mt-24 grid w-full max-w-3xl grid-cols-1 divide-y divide-gray-800 border-t border-gray-800 sm:grid-cols-3 sm:divide-x sm:divide-y-0"
+              className="animate-rise mt-16 grid w-full grid-cols-3 gap-3 sm:gap-4"
               style={{ animationDelay: "0.32s" }}
             >
               {stats.map(({ value, label }) => (
-                <div key={label} className="px-6 py-8 text-center">
-                  <dd className="text-3xl font-light tracking-tight text-slate-50 sm:text-4xl">
+                <div
+                  key={label}
+                  className="rounded-2xl border border-black/10 bg-white px-3 py-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:px-5"
+                >
+                  <dd className="text-xl font-semibold tracking-tight text-onyx sm:text-2xl">
                     {value}
                   </dd>
-                  <dt className="mt-2 text-xs uppercase tracking-widest text-slate-500">
+                  <dt className="mt-1 text-[11px] uppercase tracking-wide text-onyx/45 sm:text-xs">
                     {label}
                   </dt>
                 </div>
@@ -131,37 +130,37 @@ export default function Home() {
         </section>
 
         {/* Architecture */}
-        <section id="architecture" className="py-32 sm:py-40">
+        <section id="architecture" className="py-20 sm:py-28">
           <div className="mx-auto w-full max-w-6xl px-6 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
+            <div className="mx-auto max-w-xl text-center">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-600">
                 Architecture
               </h2>
-              <p className="mt-4 text-3xl font-semibold tracking-tight text-slate-50 sm:text-5xl">
+              <p className="mt-3 text-2xl font-semibold tracking-tight text-onyx sm:text-3xl">
                 Legacy credit scoring can&rsquo;t see rural risk coming
               </p>
-              <p className="mt-6 text-lg font-light leading-8 text-slate-400">
+              <p className="mt-4 text-base leading-7 text-onyx/60">
                 GramOS fuses structured transaction data with real-time earth
                 observation, then reasons over both with Gemini.
               </p>
             </div>
 
-            <div className="mt-20 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div className="mt-12 grid grid-cols-1 gap-5 lg:grid-cols-2">
               {/* Legacy */}
-              <div className="rounded-3xl border border-gray-800 p-10 lg:p-12">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-gray-800">
-                    <Landmark className="h-4 w-4 text-slate-500" />
+              <div className="rounded-2xl border border-black/10 bg-white p-8 shadow-sm transition hover:shadow-md">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mist">
+                    <Landmark className="h-4 w-4 text-onyx/40" />
                   </div>
-                  <h3 className="text-sm font-medium uppercase tracking-widest text-slate-500">
+                  <h3 className="text-sm font-medium uppercase tracking-widest text-onyx/40">
                     Legacy Scoring
                   </h3>
                 </div>
-                <ul className="mt-8 space-y-5">
+                <ul className="mt-6 space-y-4">
                   {legacyPoints.map((point) => (
                     <li key={point} className="flex items-start gap-3">
-                      <FileWarning className="mt-1 h-3.5 w-3.5 shrink-0 text-slate-600" />
-                      <span className="text-sm leading-7 text-slate-400">
+                      <FileWarning className="mt-1 h-3.5 w-3.5 shrink-0 text-onyx/30" />
+                      <span className="text-sm leading-6 text-onyx/60">
                         {point}
                       </span>
                     </li>
@@ -170,20 +169,20 @@ export default function Home() {
               </div>
 
               {/* GramOS */}
-              <div className="rounded-3xl border border-amber-400/40 p-10 lg:p-12">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-amber-400/40">
-                    <Database className="h-4 w-4 text-amber-400" />
+              <div className="rounded-2xl border border-lime-400/50 bg-white p-8 shadow-sm transition hover:shadow-md">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-lime-100">
+                    <Database className="h-4 w-4 text-lime-700" />
                   </div>
-                  <h3 className="text-sm font-medium uppercase tracking-widest text-amber-400">
+                  <h3 className="text-sm font-medium uppercase tracking-widest text-lime-700">
                     GramOS
                   </h3>
                 </div>
-                <ul className="mt-8 space-y-5">
+                <ul className="mt-6 space-y-4">
                   {gramosPoints.map((point) => (
                     <li key={point} className="flex items-start gap-3">
-                      <CheckCircle2 className="mt-1 h-3.5 w-3.5 shrink-0 text-amber-400" />
-                      <span className="text-sm leading-7 text-slate-300">
+                      <CheckCircle2 className="mt-1 h-3.5 w-3.5 shrink-0 text-lime-600" />
+                      <span className="text-sm leading-6 text-onyx/80">
                         {point}
                       </span>
                     </li>
@@ -193,7 +192,7 @@ export default function Home() {
             </div>
 
             {/* Pipeline strip */}
-            <div className="mt-8 flex flex-col items-stretch justify-center gap-1 rounded-3xl border border-gray-800 px-6 py-8 sm:flex-row sm:items-center sm:gap-0">
+            <div className="mt-5 flex flex-col items-stretch justify-center gap-1 rounded-2xl border border-black/10 bg-white px-6 py-6 shadow-sm sm:flex-row sm:items-center sm:gap-0">
               <PipelineStep icon={ClipboardList} label="BigQuery Transaction Logs" />
               <PipelineArrow />
               <PipelineStep icon={Satellite} label="AlphaEarth Satellite Metrics" />
@@ -210,30 +209,30 @@ export default function Home() {
         </section>
 
         {/* Features */}
-        <section id="features" className="py-32 sm:py-40">
+        <section id="features" className="py-20 sm:py-28">
           <div className="mx-auto w-full max-w-6xl px-6 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
+            <div className="mx-auto max-w-xl text-center">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-600">
                 Platform
               </h2>
-              <p className="mt-4 text-3xl font-semibold tracking-tight text-slate-50 sm:text-5xl">
+              <p className="mt-3 text-2xl font-semibold tracking-tight text-onyx sm:text-3xl">
                 One platform, three ways to de-risk your portfolio
               </p>
             </div>
 
-            <div className="mt-20 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {features.map(({ icon: Icon, title, description }) => (
                 <div
                   key={title}
-                  className="group rounded-3xl border border-gray-800 p-10 transition-colors duration-300 hover:border-amber-400/40"
+                  className="group rounded-2xl border border-black/10 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-gray-800 transition-colors duration-300 group-hover:border-amber-400/60">
-                    <Icon className="h-5 w-5 text-amber-400" />
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-lime-100 transition duration-300 group-hover:bg-lime-300">
+                    <Icon className="h-5 w-5 text-lime-700" />
                   </div>
-                  <h3 className="mt-8 text-lg font-semibold text-slate-50">
+                  <h3 className="mt-6 text-base font-semibold text-onyx">
                     {title}
                   </h3>
-                  <p className="mt-4 text-sm font-light leading-7 text-slate-400">
+                  <p className="mt-3 text-sm leading-6 text-onyx/60">
                     {description}
                   </p>
                 </div>
@@ -243,21 +242,21 @@ export default function Home() {
         </section>
 
         {/* CTA / Demo */}
-        <section id="demo" className="border-t border-gray-800">
-          <div className="mx-auto flex w-full max-w-6xl flex-col items-center px-6 py-32 text-center sm:py-40 lg:px-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-400">
+        <section id="demo" className="border-t border-black/10 bg-mist">
+          <div className="mx-auto flex w-full max-w-6xl flex-col items-center px-6 py-20 text-center sm:py-28 lg:px-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-600">
               Get started
             </p>
-            <h2 className="mt-4 max-w-xl text-3xl font-semibold tracking-tight text-slate-50 sm:text-5xl">
+            <h2 className="mt-3 max-w-lg text-2xl font-semibold tracking-tight text-onyx sm:text-3xl">
               See GramOS flag risk in your portfolio
             </h2>
-            <p className="mt-6 max-w-xl text-lg font-light leading-8 text-slate-400">
+            <p className="mt-4 max-w-lg text-base leading-7 text-onyx/60">
               Book a walkthrough with our team and bring your own transaction
               sample, and we&rsquo;ll show you the explainable risk output live.
             </p>
             <a
               href="mailto:demo@gramos.ai"
-              className="mt-10 inline-flex cursor-pointer items-center gap-2 rounded-full bg-amber-400 px-7 py-3.5 text-sm font-semibold text-onyx transition hover:bg-amber-300"
+              className="mt-8 inline-flex cursor-pointer items-center gap-2 rounded-full bg-lime-300 px-6 py-3 text-sm font-semibold text-onyx shadow-sm transition hover:-translate-y-0.5 hover:bg-lime-200 hover:shadow-md"
             >
               Request Demo
               <ArrowRight className="h-4 w-4" />
@@ -284,12 +283,12 @@ function PipelineStep({
     <div className="flex flex-1 items-center justify-center gap-2.5 px-4 py-2 text-center">
       <Icon
         className={`h-4 w-4 shrink-0 ${
-          highlight ? "text-amber-400" : "text-slate-600"
+          highlight ? "text-lime-600" : "text-onyx/35"
         }`}
       />
       <span
         className={`text-xs font-medium uppercase tracking-wider ${
-          highlight ? "text-amber-400" : "text-slate-500"
+          highlight ? "text-lime-700" : "text-onyx/50"
         }`}
       >
         {label}
@@ -300,9 +299,61 @@ function PipelineStep({
 
 function PipelineArrow() {
   return (
+    <div aria-hidden className="mx-auto h-4 w-px bg-black/10 sm:h-px sm:w-8" />
+  );
+}
+
+/** Ambient background motif: a large, slow-rotating ring of ticks behind the
+ * hero, evoking both a mill grinding wheel and a radar sweep. Pure CSS
+ * rotation, decorative only. */
+function Chakra() {
+  const spokes = Array.from({ length: 28 }, (_, i) => i);
+  return (
     <div
       aria-hidden
-      className="mx-auto h-4 w-px bg-gray-800 sm:h-px sm:w-8"
-    />
+      className="pointer-events-none absolute left-1/2 top-1/2 -z-0 h-[52rem] w-[52rem] -translate-x-1/2 -translate-y-1/2 opacity-[0.35]"
+    >
+      <svg
+        viewBox="0 0 400 400"
+        className="animate-spin-slower h-full w-full"
+      >
+        <circle
+          cx="200"
+          cy="200"
+          r="188"
+          fill="none"
+          stroke="#84cc16"
+          strokeOpacity="0.25"
+          strokeWidth="1"
+        />
+        <circle
+          cx="200"
+          cy="200"
+          r="140"
+          fill="none"
+          stroke="#84cc16"
+          strokeOpacity="0.2"
+          strokeWidth="1"
+        />
+        {spokes.map((i) => {
+          const angle = (i / spokes.length) * 360;
+          return (
+            <line
+              key={i}
+              x1="200"
+              y1="12"
+              x2="200"
+              y2="34"
+              stroke="#84cc16"
+              strokeOpacity={i % 7 === 0 ? "0.55" : "0.22"}
+              strokeWidth={i % 7 === 0 ? "2.5" : "1.5"}
+              strokeLinecap="round"
+              transform={`rotate(${angle} 200 200)`}
+            />
+          );
+        })}
+        <circle cx="200" cy="200" r="4" fill="#65a30d" fillOpacity="0.4" />
+      </svg>
+    </div>
   );
 }
