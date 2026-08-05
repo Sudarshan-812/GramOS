@@ -41,7 +41,7 @@
   --animate-spin-slower: spin-slow 70s linear infinite;
 
   /* Marker-stroke reveal behind the hero's highlighted phrase. */
-  --animate-paint-stroke: paint-stroke 0.55s cubic-bezier(0.65, 0, 0.35, 1) 0.7s
+  --animate-paint-stroke: paint-stroke 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.7s
     both;
 
   /* Gentle wind sway for the left-side plant motif (Flora in page.tsx). */
@@ -50,11 +50,16 @@
 }
 
 @keyframes paint-stroke {
-  from {
-    transform: scaleX(0);
+  0% {
+    clip-path: inset(0 100% 0 0);
+    transform: rotate(-1.5deg) scaleY(0.88);
   }
-  to {
-    transform: scaleX(1);
+  70% {
+    transform: rotate(0.75deg) scaleY(1.05);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    transform: rotate(0deg) scaleY(1);
   }
 }
 

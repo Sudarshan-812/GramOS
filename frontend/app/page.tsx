@@ -77,7 +77,7 @@ export default function Home() {
               <span className="relative inline-block whitespace-nowrap">
                 <svg
                   aria-hidden
-                  viewBox="0 0 320 46"
+                  viewBox="-8 0 320 46"
                   preserveAspectRatio="none"
                   className="animate-paint-stroke absolute -inset-x-3 inset-y-0 h-full w-[calc(100%+1.5rem)] origin-left"
                 >
@@ -421,8 +421,13 @@ function Chakra() {
  * (not the hero) so it's visible for the whole scroll. */
 function Flora() {
   const flowers = [
-    { cx: 122, cy: 472 },
-    { cx: 152, cy: 462 },
+    { cx: 55, cy: 468 },
+    { cx: 102, cy: 458 },
+  ];
+
+  const rightFlowers = [
+    { cx: 193, cy: 480 },
+    { cx: 224, cy: 468 },
   ];
 
   return (
@@ -431,74 +436,31 @@ function Flora() {
       className="pointer-events-none fixed -left-20 bottom-0 z-0 hidden h-[30rem] w-64 opacity-[0.4] xl:block"
     >
       <svg viewBox="0 0 260 520" className="h-full w-full">
-        {/* Grass tuft — a mound of overlapping bumps with thin seed-pod
-            stalks rising out of it, plus a few plain blades for fringe. */}
+        {/* Grass */}
         <g
           className="animate-sway"
-          style={{ transformOrigin: "153px 500px", animationDelay: "-1s" }}
+          style={{ transformOrigin: "68px 500px", animationDelay: "-1s" }}
         >
           {[
-            { cx: 107, rx: 12, ry: 7 },
-            { cx: 125, rx: 13, ry: 8 },
-            { cx: 143, rx: 12, ry: 7 },
-            { cx: 161, rx: 13, ry: 8 },
-            { cx: 179, rx: 12, ry: 7 },
-          ].map(({ cx, rx, ry }, i) => (
-            <ellipse
-              key={i}
-              cx={cx}
-              cy="500"
-              rx={rx}
-              ry={ry}
-              fill="none"
-              stroke="#4d7c0f"
-              strokeOpacity="0.35"
-              strokeWidth="1.5"
-            />
-          ))}
-          {[
-            "M93,498 Q87,470 91,445",
-            "M193,498 Q200,468 195,442",
+            "M20,500 Q10,460 14,420",
+            "M45,500 Q55,440 40,380",
+            "M70,500 Q60,470 68,440",
+            "M95,500 Q105,450 92,390",
+            "M115,500 Q108,470 118,430",
           ].map((d, i) => (
             <path
               key={i}
               d={d}
               fill="none"
               stroke="#4d7c0f"
-              strokeOpacity="0.3"
-              strokeWidth="1.5"
+              strokeOpacity={i % 2 === 0 ? "0.4" : "0.25"}
+              strokeWidth="3"
               strokeLinecap="round"
             />
           ))}
-          {[
-            { stalk: "M120,497 L114,432", cx: 113, cy: 424 },
-            { stalk: "M144,497 L154,405", cx: 155, cy: 396 },
-            { stalk: "M168,497 L162,445", cx: 161, cy: 437 },
-          ].map(({ stalk, cx, cy }, i) => (
-            <g key={i}>
-              <path
-                d={stalk}
-                fill="none"
-                stroke="#4d7c0f"
-                strokeOpacity="0.35"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-              <ellipse
-                cx={cx}
-                cy={cy}
-                rx="4.5"
-                ry="8"
-                fill="none"
-                stroke="#4d7c0f"
-                strokeOpacity="0.4"
-                strokeWidth="1.5"
-              />
-            </g>
-          ))}
         </g>
 
-        {/* Small outline flowers, single-line botanical style */}
+        {/* Small flowers */}
         {flowers.map(({ cx, cy }, fi) => (
           <g key={fi}>
             {Array.from({ length: 5 }, (_, i) => (
@@ -506,16 +468,14 @@ function Flora() {
                 key={i}
                 cx={cx}
                 cy={cy - 7}
-                rx="6.5"
-                ry="3.5"
-                fill="none"
-                stroke="#4d7c0f"
-                strokeOpacity="0.4"
-                strokeWidth="1.2"
+                rx="6"
+                ry="3"
+                fill="#bef264"
+                fillOpacity="0.35"
                 transform={`rotate(${(i / 5) * 360} ${cx} ${cy})`}
               />
             ))}
-            <circle cx={cx} cy={cy} r="2" fill="#4d7c0f" fillOpacity="0.45" />
+            <circle cx={cx} cy={cy} r="2.5" fill="#4d7c0f" fillOpacity="0.5" />
           </g>
         ))}
 
@@ -528,16 +488,16 @@ function Flora() {
             d="M170,500 L170,140"
             stroke="#4d7c0f"
             strokeOpacity="0.4"
-            strokeWidth="2"
+            strokeWidth="5"
             strokeLinecap="round"
           />
           {[460, 420, 380, 340, 300, 260, 220, 180].map((y) => (
             <path
               key={y}
-              d={`M164,${y} L176,${y}`}
+              d={`M162,${y} L178,${y}`}
               stroke="#4d7c0f"
               strokeOpacity="0.3"
-              strokeWidth="1.3"
+              strokeWidth="2.5"
               strokeLinecap="round"
             />
           ))}
@@ -555,12 +515,31 @@ function Flora() {
               d={d}
               fill="none"
               stroke="#84cc16"
-              strokeOpacity="0.45"
-              strokeWidth="1.3"
+              strokeOpacity="0.4"
+              strokeWidth="2"
               strokeLinecap="round"
             />
           ))}
         </g>
+
+        {/* Small flowers, right side of the cane */}
+        {rightFlowers.map(({ cx, cy }, fi) => (
+          <g key={fi}>
+            {Array.from({ length: 5 }, (_, i) => (
+              <ellipse
+                key={i}
+                cx={cx}
+                cy={cy - 7}
+                rx="6"
+                ry="3"
+                fill="#bef264"
+                fillOpacity="0.35"
+                transform={`rotate(${(i / 5) * 360} ${cx} ${cy})`}
+              />
+            ))}
+            <circle cx={cx} cy={cy} r="2.5" fill="#4d7c0f" fillOpacity="0.5" />
+          </g>
+        ))}
 
         {/* Maize */}
         <g
@@ -571,24 +550,24 @@ function Flora() {
             d="M210,500 L210,220"
             stroke="#4d7c0f"
             strokeOpacity="0.4"
-            strokeWidth="2"
+            strokeWidth="5"
             strokeLinecap="round"
           />
           <path
             d="M210,380 C185,360 170,320 175,280 C195,300 212,340 210,380 Z"
             fill="#84cc16"
-            fillOpacity="0.1"
+            fillOpacity="0.14"
             stroke="#4d7c0f"
-            strokeOpacity="0.35"
-            strokeWidth="1.2"
+            strokeOpacity="0.3"
+            strokeWidth="1"
           />
           <path
             d="M210,300 C235,280 250,240 245,200 C225,220 208,260 210,300 Z"
             fill="#84cc16"
-            fillOpacity="0.1"
+            fillOpacity="0.14"
             stroke="#4d7c0f"
-            strokeOpacity="0.35"
-            strokeWidth="1.2"
+            strokeOpacity="0.3"
+            strokeWidth="1"
           />
           <ellipse
             cx="226"
@@ -596,10 +575,10 @@ function Flora() {
             rx="10"
             ry="24"
             fill="#bef264"
-            fillOpacity="0.15"
+            fillOpacity="0.2"
             stroke="#4d7c0f"
-            strokeOpacity="0.4"
-            strokeWidth="1.2"
+            strokeOpacity="0.35"
+            strokeWidth="1"
             transform="rotate(12 226 345)"
           />
           {[
@@ -612,8 +591,8 @@ function Flora() {
               d={d}
               fill="none"
               stroke="#84cc16"
-              strokeOpacity="0.45"
-              strokeWidth="1.3"
+              strokeOpacity="0.4"
+              strokeWidth="2"
               strokeLinecap="round"
             />
           ))}
