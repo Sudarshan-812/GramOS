@@ -39,6 +39,33 @@
   /* Background "chakra" — a large, slow-rotating ring motif used as an
      ambient decorative layer (see the Chakra component in page.tsx). */
   --animate-spin-slower: spin-slow 70s linear infinite;
+
+  /* Marker-stroke reveal behind the hero's highlighted phrase. */
+  --animate-paint-stroke: paint-stroke 0.55s cubic-bezier(0.65, 0, 0.35, 1) 0.7s
+    both;
+
+  /* Gentle wind sway for the left-side plant motif (Flora in page.tsx). */
+  --animate-sway: sway 4s ease-in-out infinite;
+  --animate-sway-slow: sway 6s ease-in-out infinite;
+}
+
+@keyframes paint-stroke {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
 }
 
 @keyframes float {
@@ -76,7 +103,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .animate-aurora,
-  .animate-rise {
+  .animate-rise,
+  .animate-paint-stroke,
+  .animate-sway,
+  .animate-sway-slow {
     animation: none !important;
   }
 }
