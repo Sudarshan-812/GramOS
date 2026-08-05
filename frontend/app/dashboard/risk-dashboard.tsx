@@ -363,7 +363,7 @@ export default function RiskDashboard() {
             {loadingProfiles ? "Loading..." : "Select an enterprise to begin."}
           </div>
         ) : (
-          <div className="mx-auto flex max-w-6xl flex-col gap-8">
+          <div className="mx-auto flex max-w-6xl flex-col gap-10">
             {/* Proactive risk alerts */}
             {unreadAlerts.length > 0 && (
               <div className="flex flex-col gap-2">
@@ -425,7 +425,7 @@ export default function RiskDashboard() {
               <h2 className="text-xs font-semibold uppercase tracking-wider text-onyx/40">
                 Input Signals
               </h2>
-              <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+              <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                 <Stat
                   icon={Wallet}
                   label="Monthly Revenue"
@@ -478,16 +478,11 @@ export default function RiskDashboard() {
               </div>
             </Reveal>
 
-            {/* Chart + risk score */}
-            <Reveal delay={80} className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-              <div className="lg:col-span-2">
-                <RiskChart
-                  financials={selected.profile.financials}
-                  climate={selected.profile.climate}
-                  historyData={selected.history}
-                />
-              </div>
-              <RiskScorePanel
+            {/* Risk score: a standalone horizontal summary bar, not squeezed
+                beside the chart, so the score reads at a glance and the
+                chart gets the full-width room it needs below. */}
+            <Reveal delay={80}>
+              <RiskScoreBar
                 assessing={assessing}
                 assessError={assessError}
                 assessment={assessment}
@@ -496,8 +491,17 @@ export default function RiskDashboard() {
               />
             </Reveal>
 
+            {/* Chart: standalone full-width section */}
+            <Reveal delay={140}>
+              <RiskChart
+                financials={selected.profile.financials}
+                climate={selected.profile.climate}
+                historyData={selected.history}
+              />
+            </Reveal>
+
             {/* Document intelligence */}
-            <Reveal delay={160} className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <Reveal delay={200} className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <DocumentUploader
                 enterpriseId={selected.key}
                 onUploadSuccess={handleDocumentUploaded}
@@ -723,9 +727,10 @@ function SummaryCard({
   );
 }
 
-/** Side-column panel that shows the loading / error / empty / result state of the
- * Gemini risk assessment, alongside the always-available RiskChart. */
-function RiskScorePanel({
+/** Horizontal summary bar for the Gemini risk assessment (loading / error / empty /
+ * result state) that sits above the chart rather than squeezed beside it, so the
+ * chart gets a full-width, standalone section of its own. */
+function RiskScoreBar({
   assessing,
   assessError,
   assessment,
@@ -740,8 +745,8 @@ function RiskScorePanel({
 }) {
   if (assessing) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-3 rounded-2xl border border-black/10 bg-white p-8 text-center shadow-sm">
-        <Loader2 className="h-6 w-6 animate-spin text-lime-600" />
+      <div className="flex items-center gap-3 rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
+        <Loader2 className="h-5 w-5 shrink-0 animate-spin text-lime-600" />
         <p className="text-sm text-onyx/50">
           Gemini is reasoning over financial and climate signals...
         </p>
@@ -751,20 +756,22 @@ function RiskScorePanel({
 
   if (assessError) {
     return (
-      <div className="flex h-full flex-col items-start gap-2 rounded-2xl border border-red-200 bg-red-50 p-6">
+      <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-6">
         <AlertTriangle className="h-5 w-5 shrink-0 text-red-500" />
-        <p className="text-sm font-semibold text-red-700">
-          Risk assessment failed
-        </p>
-        <p className="text-sm text-red-600">{assessError}</p>
+        <div>
+          <p className="text-sm font-semibold text-red-700">
+            Risk assessment failed
+          </p>
+          <p className="mt-0.5 text-sm text-red-600">{assessError}</p>
+        </div>
       </div>
     );
   }
 
   if (!assessment) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-black/15 bg-white p-8 text-center">
-        <Sparkles className="h-6 w-6 text-onyx/25" />
+      <div className="flex items-center gap-3 rounded-2xl border border-dashed border-black/15 bg-white p-6">
+        <Sparkles className="h-5 w-5 shrink-0 text-onyx/25" />
         <p className="text-sm text-onyx/40">
           Click &ldquo;Simulate API Call&rdquo; to run the GramOS XAI risk
           engine on this enterprise.
@@ -778,34 +785,31 @@ function RiskScorePanel({
     ? classifyRisk(override.overridden_score)
     : assessment.risk_classification;
   const styles = RISK_STYLES[displayClassification];
-  const radius = 54;
+  const radius = 40;
   const circumference = 2 * Math.PI * radius;
   const clampedScore = Math.min(100, Math.max(0, displayScore));
   const offset = circumference - (clampedScore / 100) * circumference;
 
   return (
-    <div className="flex h-full flex-col items-center gap-4 rounded-2xl border border-black/10 bg-white p-6 text-center shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-wider text-onyx/40">
-        NPA Risk Classification
-      </p>
-      <div className="relative h-32 w-32 shrink-0">
-        <svg viewBox="0 0 120 120" className="h-32 w-32 -rotate-90">
+    <div className="flex flex-col items-center gap-6 rounded-2xl border border-black/10 bg-white p-6 shadow-sm sm:flex-row">
+      <div className="relative h-24 w-24 shrink-0">
+        <svg viewBox="0 0 92 92" className="h-24 w-24 -rotate-90">
           <circle
-            cx="60"
-            cy="60"
+            cx="46"
+            cy="46"
             r={radius}
             fill="none"
             stroke="currentColor"
-            strokeWidth="10"
+            strokeWidth="8"
             className="text-black/10"
           />
           <circle
-            cx="60"
-            cy="60"
+            cx="46"
+            cy="46"
             r={radius}
             fill="none"
             stroke="currentColor"
-            strokeWidth="10"
+            strokeWidth="8"
             strokeLinecap="round"
             strokeDasharray={circumference}
             strokeDashoffset={offset}
@@ -813,43 +817,47 @@ function RiskScorePanel({
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-3xl font-bold text-onyx">
-            {displayScore}
-          </span>
-          <span className="text-xs text-onyx/40">/ 100</span>
+          <span className="text-2xl font-bold text-onyx">{displayScore}</span>
+          <span className="text-[10px] text-onyx/40">/ 100</span>
         </div>
       </div>
-      <span
-        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-semibold ${styles.badge}`}
-      >
-        <span className={`h-2 w-2 rounded-full ${styles.dot}`} />
-        {displayClassification}
-      </span>
 
-      {override ? (
-        <span className="inline-flex items-center gap-1 rounded-full border border-lime-300 bg-lime-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-lime-700">
-          <ShieldCheck className="h-3 w-3" />
-          Human Overridden
-        </span>
-      ) : (
-        assessment.is_cached_fallback && (
-          <span className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-mist px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-onyx/40">
-            <WifiOff className="h-3 w-3" />
-            Offline / Fallback Mode
+      <div className="flex-1 text-center sm:text-left">
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+          <p className="text-xs font-semibold uppercase tracking-wider text-onyx/40">
+            NPA Risk Classification
+          </p>
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${styles.badge}`}
+          >
+            <span className={`h-1.5 w-1.5 rounded-full ${styles.dot}`} />
+            {displayClassification}
           </span>
-        )
-      )}
-
-      <p className="text-xs leading-5 text-onyx/40">
-        {override
-          ? `Overridden from the AI score of ${override.original_score}, logged to the compliance audit trail.`
-          : "Generated by the Gemini XAI risk engine, fusing transaction logs with AlphaEarth climate metrics."}
-      </p>
+          {override ? (
+            <span className="inline-flex items-center gap-1 rounded-full border border-lime-300 bg-lime-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-lime-700">
+              <ShieldCheck className="h-3 w-3" />
+              Human Overridden
+            </span>
+          ) : (
+            assessment.is_cached_fallback && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-mist px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-onyx/40">
+                <WifiOff className="h-3 w-3" />
+                Offline / Fallback Mode
+              </span>
+            )
+          )}
+        </div>
+        <p className="mt-2 text-sm leading-5 text-onyx/50">
+          {override
+            ? `Overridden from the AI score of ${override.original_score}, logged to the compliance audit trail.`
+            : "Generated by the Gemini XAI risk engine, fusing transaction logs with AlphaEarth climate metrics."}
+        </p>
+      </div>
 
       <button
         type="button"
         onClick={onOverrideClick}
-        className="mt-1 inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-black/10 px-3 py-1.5 text-xs font-medium text-onyx/70 transition hover:border-lime-400 hover:text-lime-700"
+        className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-md border border-black/10 px-3 py-1.5 text-xs font-medium text-onyx/70 transition hover:border-lime-400 hover:text-lime-700"
       >
         <PenLine className="h-3.5 w-3.5" />
         {override ? "Override Again" : "Manual Override"}
