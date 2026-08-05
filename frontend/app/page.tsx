@@ -57,24 +57,23 @@ const stats = [
 export default function Home() {
   return (
     <div id="top" className="flex flex-1 flex-col bg-paper text-onyx">
+      <Chakra />
       <Navbar />
 
-      <main className="flex-1">
+      <main className="relative z-10 flex-1">
         {/* Hero */}
         <section className="relative overflow-hidden">
-          <Chakra />
-
           <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center px-6 py-20 text-center lg:px-8 lg:py-28">
             <span className="animate-rise inline-flex items-center rounded-full border border-black/10 bg-white px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-onyx/50 shadow-sm">
               Built for rural credit risk
             </span>
 
             <h1
-              className="animate-rise mt-6 max-w-2xl text-balance text-4xl font-semibold tracking-tight text-onyx sm:text-5xl"
+              className="animate-rise mt-6 max-w-2xl text-balance text-4xl font-semibold leading-[1.35] tracking-tight text-onyx sm:text-5xl sm:leading-[1.3]"
               style={{ animationDelay: "0.08s" }}
             >
               The AI Operating System for{" "}
-              <span className="rounded-lg bg-lime-300 px-2 py-0.5">
+              <span className="inline-block rounded-lg bg-lime-300 px-2 py-0.5">
                 Rural Financial Intelligence
               </span>
             </h1>
@@ -303,56 +302,63 @@ function PipelineArrow() {
   );
 }
 
-/** Ambient background motif: a large, slow-rotating ring of ticks behind the
- * hero, evoking both a mill grinding wheel and a radar sweep. Pure CSS
- * rotation, decorative only. */
+/** Ambient background motif: a lotus of leaf-shaped petals slow-spinning
+ * around a rupee mark, pinned to the viewport (not the hero) so it stays
+ * visible for the whole scroll. Sits in the right margin outside the
+ * content column, behind everything (-z-10), pure CSS rotation. */
 function Chakra() {
-  const spokes = Array.from({ length: 28 }, (_, i) => i);
+  const petalCount = 12;
+  const petals = Array.from({ length: petalCount }, (_, i) => i);
   return (
     <div
       aria-hidden
-      className="pointer-events-none absolute left-1/2 top-1/2 -z-0 h-[52rem] w-[52rem] -translate-x-1/2 -translate-y-1/2 opacity-[0.35]"
+      className="pointer-events-none fixed -right-56 top-28 z-0 hidden h-[40rem] w-[40rem] opacity-[0.4] xl:block"
     >
-      <svg
-        viewBox="0 0 400 400"
-        className="animate-spin-slower h-full w-full"
-      >
+      <svg viewBox="0 0 400 400" className="animate-spin-slower h-full w-full">
         <circle
           cx="200"
           cy="200"
-          r="188"
+          r="192"
           fill="none"
-          stroke="#84cc16"
-          strokeOpacity="0.25"
+          stroke="#65a30d"
+          strokeOpacity="0.15"
           strokeWidth="1"
         />
-        <circle
-          cx="200"
-          cy="200"
-          r="140"
-          fill="none"
-          stroke="#84cc16"
-          strokeOpacity="0.2"
-          strokeWidth="1"
-        />
-        {spokes.map((i) => {
-          const angle = (i / spokes.length) * 360;
+        {petals.map((i) => {
+          const angle = (i / petalCount) * 360;
           return (
-            <line
+            <path
               key={i}
-              x1="200"
-              y1="12"
-              x2="200"
-              y2="34"
-              stroke="#84cc16"
-              strokeOpacity={i % 7 === 0 ? "0.55" : "0.22"}
-              strokeWidth={i % 7 === 0 ? "2.5" : "1.5"}
-              strokeLinecap="round"
+              d="M200,145 C182,110 182,60 200,32 C218,60 218,110 200,145 Z"
+              fill="#84cc16"
+              fillOpacity={i % 2 === 0 ? "0.14" : "0.07"}
+              stroke="#4d7c0f"
+              strokeOpacity="0.3"
+              strokeWidth="1"
               transform={`rotate(${angle} 200 200)`}
             />
           );
         })}
-        <circle cx="200" cy="200" r="4" fill="#65a30d" fillOpacity="0.4" />
+        <circle
+          cx="200"
+          cy="200"
+          r="36"
+          fill="#fafaf6"
+          stroke="#65a30d"
+          strokeOpacity="0.4"
+          strokeWidth="1"
+        />
+        <text
+          x="200"
+          y="212"
+          textAnchor="middle"
+          fontSize="32"
+          fontWeight="600"
+          fill="#4d7c0f"
+          fillOpacity="0.6"
+        >
+          ₹
+        </text>
       </svg>
     </div>
   );

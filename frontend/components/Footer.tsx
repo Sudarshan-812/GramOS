@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-black/5 bg-paper">
+    <footer className="relative z-10 border-t border-black/5 bg-paper">
       <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-4 px-6 py-6 text-sm text-onyx/50 sm:flex-row lg:px-8">
         <a href="#top" className="flex cursor-pointer items-center gap-2">
           <Image
