@@ -73,16 +73,16 @@ export default function OverrideScoreModal({
       <form
         onSubmit={handleSubmit}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md rounded-2xl border border-gray-700/60 bg-card p-6"
+        className="w-full max-w-md rounded-2xl border border-black/10 bg-white p-6 shadow-xl"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-sm font-semibold text-slate-50">
+            <h2 className="text-sm font-semibold text-onyx">
               Manual Score Override
             </h2>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-onyx/40">
               Current AI score:{" "}
-              <span className="font-semibold text-slate-300">
+              <span className="font-semibold text-onyx/70">
                 {currentScore} / 100
               </span>
               . This action is logged to the compliance audit trail.
@@ -92,14 +92,14 @@ export default function OverrideScoreModal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="cursor-pointer rounded-md p-1 text-slate-500 transition hover:bg-onyx hover:text-slate-200"
+            className="cursor-pointer rounded-md p-1 text-onyx/40 transition hover:bg-mist hover:text-onyx"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
         <div className="mt-5 flex flex-col gap-4">
-          <label className="flex flex-col gap-1.5 text-sm text-slate-300">
+          <label className="flex flex-col gap-1.5 text-sm text-onyx/70">
             New Score (0–100)
             <input
               type="number"
@@ -109,10 +109,10 @@ export default function OverrideScoreModal({
               required
               value={overriddenScore}
               onChange={(e) => setOverriddenScore(e.target.value)}
-              className="rounded-md border border-gray-700 bg-onyx px-3 py-2 text-sm text-slate-100 outline-none focus:border-amber-400"
+              className="rounded-md border border-black/10 bg-white px-3 py-2 text-sm text-onyx outline-none focus:border-lime-400"
             />
           </label>
-          <label className="flex flex-col gap-1.5 text-sm text-slate-300">
+          <label className="flex flex-col gap-1.5 text-sm text-onyx/70">
             Justification
             <textarea
               required
@@ -120,13 +120,13 @@ export default function OverrideScoreModal({
               value={justification}
               onChange={(e) => setJustification(e.target.value)}
               placeholder="e.g. Site visit confirmed stronger fodder reserves than satellite NDVI suggested."
-              className="resize-none rounded-md border border-gray-700 bg-onyx px-3 py-2 text-sm text-slate-100 outline-none placeholder:text-slate-600 focus:border-amber-400"
+              className="resize-none rounded-md border border-black/10 bg-white px-3 py-2 text-sm text-onyx outline-none placeholder:text-onyx/30 focus:border-lime-400"
             />
           </label>
         </div>
 
         {error && (
-          <div className="mt-4 flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
+          <div className="mt-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
             {error}
           </div>
@@ -136,14 +136,14 @@ export default function OverrideScoreModal({
           <button
             type="button"
             onClick={onClose}
-            className="cursor-pointer rounded-md border border-gray-700 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:bg-onyx"
+            className="cursor-pointer rounded-md border border-black/10 px-4 py-2 text-sm font-semibold text-onyx/70 transition hover:bg-mist"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-amber-400 px-4 py-2 text-sm font-semibold text-onyx transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-lime-300 px-4 py-2 text-sm font-semibold text-onyx transition hover:bg-lime-200 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {submitting ? (
               <>

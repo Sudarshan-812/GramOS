@@ -37,13 +37,13 @@ interface RiskChartProps {
 }
 
 const COLORS = {
-  emerald: "#34d399", // historical + actual revenue
+  emerald: "#10b981", // historical + actual revenue
   slate: "#94a3b8", // projected revenue / historical NDVI
-  slateGrid: "#374151",
-  red: "#f87171", // critical climate threshold
-  gold: "#fbbf24",
-  ink: "#f8fafc",
-  muted: "#94a3b8",
+  slateGrid: "#e5e7eb",
+  red: "#ef4444", // critical climate threshold
+  gold: "#65a30d",
+  ink: "#121412",
+  muted: "#78716c",
 };
 
 const PROJECTION_MONTHS = 6;
@@ -259,8 +259,8 @@ function ChartTooltip({ active, payload, label }: TooltipContentProps) {
   if (entries.length === 0) return null;
 
   return (
-    <div className="rounded-lg border border-gray-700 bg-onyx px-3 py-2 shadow-lg shadow-black/40">
-      <p className="text-xs font-medium text-slate-500">
+    <div className="rounded-lg border border-black/10 bg-white px-3 py-2 shadow-lg shadow-black/10">
+      <p className="text-xs font-medium text-onyx/40">
         {typeof label === "number" ? formatDayOffset(label) : label}
       </p>
       <div className="mt-1 space-y-1">
@@ -278,7 +278,7 @@ function ChartTooltip({ active, payload, label }: TooltipContentProps) {
           return (
             <div key={idx} className="flex items-center gap-2">
               <span className="h-0.5 w-3 shrink-0" style={{ backgroundColor: color }} />
-              <span className="text-sm font-semibold text-slate-100">{text}</span>
+              <span className="text-sm font-semibold text-onyx">{text}</span>
             </div>
           );
         })}
@@ -305,7 +305,7 @@ function ProjectedDot({ cx, cy, payload }: DotProps) {
         cy={cy}
         r={isLast ? 5 : 4}
         fill={isCritical ? COLORS.red : COLORS.slate}
-        stroke="#1e221f"
+        stroke="#ffffff"
         strokeWidth={2}
       />
       {isLast && (
@@ -329,7 +329,7 @@ function ActualDot({ cx, cy, payload }: DotProps) {
   if (!isLast) return null;
   return (
     <g>
-      <circle cx={cx} cy={cy} r={4} fill={COLORS.emerald} stroke="#1e221f" strokeWidth={2} />
+      <circle cx={cx} cy={cy} r={4} fill={COLORS.emerald} stroke="#ffffff" strokeWidth={2} />
       <text
         x={cx}
         y={cy - 14}
@@ -345,7 +345,7 @@ function ActualDot({ cx, cy, payload }: DotProps) {
 
 function ModeSelector({ mode, onChange }: { mode: ChartMode; onChange: (mode: ChartMode) => void }) {
   return (
-    <div className="inline-flex items-center gap-1 rounded-lg border border-gray-700/60 bg-onyx p-1">
+    <div className="inline-flex items-center gap-1 rounded-lg border border-black/10 bg-mist p-1">
       {CHART_MODES.map(({ id, label, icon: Icon }) => (
         <button
           key={id}
@@ -353,8 +353,8 @@ function ModeSelector({ mode, onChange }: { mode: ChartMode; onChange: (mode: Ch
           onClick={() => onChange(id)}
           className={`inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition ${
             mode === id
-              ? "bg-amber-400 text-onyx"
-              : "text-slate-400 hover:text-slate-100"
+              ? "bg-lime-300 text-onyx"
+              : "text-onyx/50 hover:text-onyx"
           }`}
         >
           <Icon className="h-3.5 w-3.5" />
@@ -388,7 +388,7 @@ function LineView({ financials, climate, historyData }: RiskChartProps) {
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400">
+      <div className="flex flex-wrap items-center gap-4 text-xs text-onyx/50">
         <span className="flex items-center gap-1.5">
           <span className="h-0.5 w-4" style={{ backgroundColor: COLORS.emerald }} />
           Historical revenue
@@ -414,7 +414,7 @@ function LineView({ financials, climate, historyData }: RiskChartProps) {
       </div>
 
       {isCritical && (
-        <p className="mt-3 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400">
+        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700">
           Projected revenue falls below the critical cash flow threshold by month 6.
         </p>
       )}
@@ -543,7 +543,7 @@ function AreaView({ financials, climate, historyData }: RiskChartProps) {
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400">
+      <div className="flex flex-wrap items-center gap-4 text-xs text-onyx/50">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS.emerald }} />
           Actual revenue
@@ -562,7 +562,7 @@ function AreaView({ financials, climate, historyData }: RiskChartProps) {
       </div>
 
       {isCritical && (
-        <p className="mt-3 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400">
+        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700">
           Projected revenue falls below the critical cash flow threshold by month 6.
         </p>
       )}
@@ -639,7 +639,7 @@ function BarView({ financials, climate, historyData }: RiskChartProps) {
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400">
+      <div className="flex flex-wrap items-center gap-4 text-xs text-onyx/50">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: COLORS.emerald }} />
           Current
@@ -658,7 +658,7 @@ function BarView({ financials, climate, historyData }: RiskChartProps) {
       </div>
 
       {isCritical && (
-        <p className="mt-3 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400">
+        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700">
           Projected revenue falls below the critical cash flow threshold by month 6.
         </p>
       )}
@@ -711,7 +711,7 @@ function RiskProfileView({ financials, climate }: RiskChartProps) {
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400">
+      <div className="flex flex-wrap items-center gap-4 text-xs text-onyx/50">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS.gold }} />
           Normalized health score (0–100, higher is healthier)
@@ -719,7 +719,7 @@ function RiskProfileView({ financials, climate }: RiskChartProps) {
       </div>
 
       {weakMetrics.length > 0 && (
-        <p className="mt-3 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-medium text-red-400">
+        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700">
           {weakMetrics.length === 1
             ? `${weakMetrics[0].metric} is in a weak range (below 40/100).`
             : `${weakMetrics.length} signals are in a weak range (below 40/100): ${weakMetrics
@@ -778,11 +778,11 @@ export default function RiskChart(props: RiskChartProps) {
   const meta = MODE_META[mode];
 
   return (
-    <div className="rounded-2xl border border-gray-700/60 bg-card p-6">
+    <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
       <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <h2 className="text-sm font-semibold text-slate-50">{meta.title}</h2>
-          <p className="mt-0.5 text-xs text-slate-500">{meta.subtitle}</p>
+          <h2 className="text-sm font-semibold text-onyx">{meta.title}</h2>
+          <p className="mt-0.5 text-xs text-onyx/40">{meta.subtitle}</p>
         </div>
         <ModeSelector mode={mode} onChange={setMode} />
       </div>

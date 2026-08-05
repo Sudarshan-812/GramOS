@@ -59,11 +59,11 @@ export default function DocumentUploader({
   }
 
   return (
-    <div className="rounded-2xl border border-gray-700/60 bg-card p-6">
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+    <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
+      <h2 className="text-xs font-semibold uppercase tracking-wider text-onyx/40">
         Upload Document
       </h2>
-      <p className="mt-1 text-sm text-slate-500">
+      <p className="mt-1 text-sm text-onyx/40">
         Upload a bank statement, KCC passbook, invoice, or other financial
         document to extract underwriting insights.
       </p>
@@ -78,10 +78,10 @@ export default function DocumentUploader({
         onClick={() => !uploading && inputRef.current?.click()}
         className={`mt-4 flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-10 text-center transition ${
           uploading
-            ? "cursor-not-allowed border-gray-700 bg-onyx"
+            ? "cursor-not-allowed border-black/10 bg-mist"
             : isDragging
-              ? "cursor-pointer border-amber-400 bg-onyx"
-              : "cursor-pointer border-gray-700 hover:border-gray-500 hover:bg-onyx"
+              ? "cursor-pointer border-lime-400 bg-lime-50"
+              : "cursor-pointer border-black/15 hover:border-black/25 hover:bg-mist"
         }`}
       >
         <input
@@ -98,18 +98,18 @@ export default function DocumentUploader({
 
         {uploading ? (
           <>
-            <Loader2 className="h-8 w-8 animate-spin text-amber-400" />
-            <p className="text-sm text-slate-400">
+            <Loader2 className="h-8 w-8 animate-spin text-lime-600" />
+            <p className="text-sm text-onyx/50">
               Extracting insights with Gemini...
             </p>
           </>
         ) : (
           <>
-            <UploadCloud className="h-8 w-8 text-slate-500" />
-            <p className="text-sm font-medium text-slate-300">
+            <UploadCloud className="h-8 w-8 text-onyx/30" />
+            <p className="text-sm font-medium text-onyx/70">
               Drag &amp; drop a file here, or click to browse
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-onyx/40">
               PDF, JPEG, PNG, WEBP, HEIC (up to 20MB)
             </p>
           </>
@@ -117,7 +117,7 @@ export default function DocumentUploader({
       </div>
 
       {error && (
-        <div className="mt-4 flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
+        <div className="mt-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           {error}
         </div>
