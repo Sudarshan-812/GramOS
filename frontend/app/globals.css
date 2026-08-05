@@ -114,6 +114,32 @@
   .animate-sway-slow {
     animation: none !important;
   }
+
+  .reveal {
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* Scroll-triggered reveal (see components/Reveal.tsx): sections fade, rise,
+   and sharpen into place as they enter the viewport, one time only. */
+.reveal {
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(28px) scale(0.985);
+  transition:
+    opacity 0.9s cubic-bezier(0.16, 0.84, 0.24, 1),
+    transform 0.9s cubic-bezier(0.16, 0.84, 0.24, 1),
+    filter 0.9s cubic-bezier(0.16, 0.84, 0.24, 1);
+  will-change: opacity, transform, filter;
+}
+
+.reveal.in-view {
+  opacity: 1;
+  filter: blur(0);
+  transform: none;
 }
 
 @keyframes twinkle {

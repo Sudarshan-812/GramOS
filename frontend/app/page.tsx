@@ -12,6 +12,7 @@ import {
 import Footer from "@/components/Footer";
 import { AIIcon, ForecastIcon, GlobeIcon } from "@/components/icons/FeatureIcons";
 import Navbar from "@/components/Navbar";
+import Reveal from "@/components/Reveal";
 
 const features = [
   {
@@ -182,7 +183,7 @@ export default function Home() {
         {/* Architecture */}
         <section id="architecture" className="py-20 sm:py-28">
           <div className="mx-auto w-full max-w-6xl px-6 lg:px-8">
-            <div className="mx-auto max-w-xl text-center">
+            <Reveal className="mx-auto max-w-xl text-center">
               <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-600">
                 Architecture
               </h2>
@@ -193,99 +194,104 @@ export default function Home() {
                 GramOS fuses structured transaction data with real-time earth
                 observation, then reasons over both with Gemini.
               </p>
-            </div>
+            </Reveal>
 
             <div className="mt-12 grid grid-cols-1 gap-5 lg:grid-cols-2">
               {/* Legacy */}
-              <div className="rounded-2xl border border-black/10 bg-white p-8 shadow-sm transition hover:shadow-md">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mist">
-                    <Landmark className="h-4 w-4 text-onyx/40" />
+              <Reveal>
+                <div className="rounded-2xl border border-black/10 bg-white p-8 shadow-sm transition hover:shadow-md">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mist">
+                      <Landmark className="h-4 w-4 text-onyx/40" />
+                    </div>
+                    <h3 className="text-sm font-medium uppercase tracking-widest text-onyx/40">
+                      Legacy Scoring
+                    </h3>
                   </div>
-                  <h3 className="text-sm font-medium uppercase tracking-widest text-onyx/40">
-                    Legacy Scoring
-                  </h3>
+                  <ul className="mt-6 space-y-4">
+                    {legacyPoints.map((point) => (
+                      <li key={point} className="flex items-start gap-3">
+                        <FileWarning className="mt-1 h-3.5 w-3.5 shrink-0 text-onyx/30" />
+                        <span className="text-sm leading-6 text-onyx/60">
+                          {point}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="mt-6 space-y-4">
-                  {legacyPoints.map((point) => (
-                    <li key={point} className="flex items-start gap-3">
-                      <FileWarning className="mt-1 h-3.5 w-3.5 shrink-0 text-onyx/30" />
-                      <span className="text-sm leading-6 text-onyx/60">
-                        {point}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              </Reveal>
 
               {/* GramOS */}
-              <div className="rounded-2xl border border-lime-400/50 bg-white p-8 shadow-sm transition hover:shadow-md">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-lime-100">
-                    <Database className="h-4 w-4 text-lime-700" />
+              <Reveal delay={100}>
+                <div className="rounded-2xl border border-lime-400/50 bg-white p-8 shadow-sm transition hover:shadow-md">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-lime-100">
+                      <Database className="h-4 w-4 text-lime-700" />
+                    </div>
+                    <h3 className="text-sm font-medium uppercase tracking-widest text-lime-700">
+                      GramOS
+                    </h3>
                   </div>
-                  <h3 className="text-sm font-medium uppercase tracking-widest text-lime-700">
-                    GramOS
-                  </h3>
+                  <ul className="mt-6 space-y-4">
+                    {gramosPoints.map((point) => (
+                      <li key={point} className="flex items-start gap-3">
+                        <CheckCircle2 className="mt-1 h-3.5 w-3.5 shrink-0 text-lime-600" />
+                        <span className="text-sm leading-6 text-onyx/80">
+                          {point}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ul className="mt-6 space-y-4">
-                  {gramosPoints.map((point) => (
-                    <li key={point} className="flex items-start gap-3">
-                      <CheckCircle2 className="mt-1 h-3.5 w-3.5 shrink-0 text-lime-600" />
-                      <span className="text-sm leading-6 text-onyx/80">
-                        {point}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              </Reveal>
             </div>
 
             {/* Pipeline strip */}
-            <div className="mt-5 flex flex-col items-stretch justify-center gap-1 rounded-2xl border border-black/10 bg-white px-6 py-6 shadow-sm sm:flex-row sm:items-center sm:gap-0">
-              <PipelineStep icon={ClipboardList} label="BigQuery Transaction Logs" />
-              <PipelineArrow />
-              <PipelineStep icon={Satellite} label="AlphaEarth Satellite Metrics" />
-              <PipelineArrow />
-              <PipelineStep
-                icon={Sparkles}
-                label="Gemini Reasoning Engine"
-                highlight
-              />
-              <PipelineArrow />
-              <PipelineStep icon={TrendingUp} label="Explainable Risk Score" />
-            </div>
+            <Reveal delay={200}>
+              <div className="mt-5 flex flex-col items-stretch justify-center gap-1 rounded-2xl border border-black/10 bg-white px-6 py-6 shadow-sm sm:flex-row sm:items-center sm:gap-0">
+                <PipelineStep icon={ClipboardList} label="BigQuery Transaction Logs" />
+                <PipelineArrow />
+                <PipelineStep icon={Satellite} label="AlphaEarth Satellite Metrics" />
+                <PipelineArrow />
+                <PipelineStep
+                  icon={Sparkles}
+                  label="Gemini Reasoning Engine"
+                  highlight
+                />
+                <PipelineArrow />
+                <PipelineStep icon={TrendingUp} label="Explainable Risk Score" />
+              </div>
+            </Reveal>
           </div>
         </section>
 
         {/* Features */}
         <section id="features" className="py-20 sm:py-28">
           <div className="mx-auto w-full max-w-6xl px-6 lg:px-8">
-            <div className="mx-auto max-w-xl text-center">
+            <Reveal className="mx-auto max-w-xl text-center">
               <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-600">
                 Platform
               </h2>
               <p className="mt-3 text-2xl font-semibold tracking-tight text-onyx sm:text-3xl">
                 One platform, three ways to de-risk your portfolio
               </p>
-            </div>
+            </Reveal>
 
             <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {features.map(({ icon: Icon, title, description }) => (
-                <div
-                  key={title}
-                  className="group rounded-2xl border border-black/10 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
-                >
-                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-lime-100 transition duration-300 group-hover:bg-lime-300">
-                    <Icon className="h-5 w-5 text-lime-700" />
+              {features.map(({ icon: Icon, title, description }, i) => (
+                <Reveal key={title} delay={i * 80}>
+                  <div className="group rounded-2xl border border-black/10 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-lime-100 transition duration-300 group-hover:bg-lime-300">
+                      <Icon className="h-5 w-5 text-lime-700" />
+                    </div>
+                    <h3 className="mt-6 text-base font-semibold text-onyx">
+                      {title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-6 text-onyx/60">
+                      {description}
+                    </p>
                   </div>
-                  <h3 className="mt-6 text-base font-semibold text-onyx">
-                    {title}
-                  </h3>
-                  <p className="mt-3 text-sm leading-6 text-onyx/60">
-                    {description}
-                  </p>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -294,23 +300,26 @@ export default function Home() {
         {/* CTA / Demo */}
         <section id="demo" className="border-t border-black/10 bg-mist">
           <div className="mx-auto flex w-full max-w-6xl flex-col items-center px-6 py-20 text-center sm:py-28 lg:px-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-600">
-              Get started
-            </p>
-            <h2 className="mt-3 max-w-lg text-2xl font-semibold tracking-tight text-onyx sm:text-3xl">
-              See GramOS flag risk in your portfolio
-            </h2>
-            <p className="mt-4 max-w-lg text-base leading-7 text-onyx/60">
-              Book a walkthrough with our team and bring your own transaction
-              sample, and we&rsquo;ll show you the explainable risk output live.
-            </p>
-            <a
-              href="mailto:demo@gramos.ai"
-              className="mt-8 inline-flex cursor-pointer items-center gap-2 rounded-full bg-lime-300 px-6 py-3 text-sm font-semibold text-onyx shadow-sm transition hover:-translate-y-0.5 hover:bg-lime-200 hover:shadow-md"
-            >
-              Request Demo
-              <ArrowRight className="h-4 w-4" />
-            </a>
+            <Reveal className="flex flex-col items-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-lime-600">
+                Get started
+              </p>
+              <h2 className="mt-3 max-w-lg text-2xl font-semibold tracking-tight text-onyx sm:text-3xl">
+                See GramOS flag risk in your portfolio
+              </h2>
+              <p className="mt-4 max-w-lg text-base leading-7 text-onyx/60">
+                Book a walkthrough with our team and bring your own
+                transaction sample, and we&rsquo;ll show you the explainable
+                risk output live.
+              </p>
+              <a
+                href="mailto:demo@gramos.ai"
+                className="mt-8 inline-flex cursor-pointer items-center gap-2 rounded-full bg-lime-300 px-6 py-3 text-sm font-semibold text-onyx shadow-sm transition hover:-translate-y-0.5 hover:bg-lime-200 hover:shadow-md"
+              >
+                Request Demo
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            </Reveal>
           </div>
         </section>
       </main>
