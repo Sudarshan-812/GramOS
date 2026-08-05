@@ -37,7 +37,7 @@ export default function Navbar() {
 
         <a
           href="#demo"
-          className="inline-flex cursor-pointer items-center rounded-md bg-amber-400 px-3.5 py-1.5 text-sm font-semibold text-onyx transition hover:bg-amber-300"
+          className="inline-flex cursor-pointer items-center rounded-full bg-amber-400 px-4 py-1.5 text-sm font-semibold text-onyx transition hover:bg-amber-300"
         >
           Request Demo
         </a>
