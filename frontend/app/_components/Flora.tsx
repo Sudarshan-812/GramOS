@@ -16,7 +16,7 @@ export default function Flora() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none fixed -left-20 bottom-0 z-0 hidden h-[30rem] w-64 opacity-[0.4] xl:block"
+      className="pointer-events-none fixed -left-20 bottom-0 z-0 hidden h-[30rem] w-64 opacity-[0.55] xl:block"
     >
       <svg viewBox="0 0 260 520" className="h-full w-full">
         {/* Grass */}

@@ -8,7 +8,7 @@ export default function Chakra() {
   return (
     <div
       aria-hidden
-      className="pointer-events-none fixed -right-56 top-28 z-0 hidden h-[40rem] w-[40rem] opacity-[0.4] xl:block"
+      className="pointer-events-none fixed -right-56 top-28 z-0 hidden h-[40rem] w-[40rem] opacity-[0.55] xl:block"
     >
       <svg viewBox="0 0 400 400" className="animate-spin-slower h-full w-full">
         <circle
