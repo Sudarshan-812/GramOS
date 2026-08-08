@@ -22,11 +22,24 @@ export interface BuyerPaymentProfile {
   confidence: string;
 }
 
+export interface WrisClimateSnapshot {
+  district: string;
+  period_start: string;
+  period_end: string;
+  rainfall_mm_total: number | null;
+  rainfall_station_count: number;
+  groundwater_avg_level_m: number | null;
+  groundwater_station_count: number;
+  soil_moisture_avg_pct: number | null;
+  source: string;
+}
+
 export interface RiskAssessmentRequest {
   enterprise_name: string;
   financials: FinancialProfile;
   climate: ClimateProfile;
   buyer_payment?: BuyerPaymentProfile | null;
+  wris_climate?: WrisClimateSnapshot | null;
 }
 
 export type RiskClassification = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
@@ -37,6 +50,7 @@ export interface RiskAssessmentResponse {
   financial_health_summary: string;
   climate_risk_impact: string;
   buyer_payment_risk_impact: string | null;
+  wris_climate_note: string | null;
   actionable_mitigation_steps: string[];
   is_cached_fallback: boolean;
 }

@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   Circle,
   CloudRain,
+  Database,
   Droplets,
   FileText,
   Landmark,
@@ -97,6 +98,14 @@ function enterpriseIcon(businessType: string) {
     return Building2;
   return Building2;
 }
+
+// Keyed by how many summary cards are actually rendered (2 base + up to 2 optional
+// signals), since a fixed column count either wastes space or crams a 4th card in.
+const SUMMARY_CARD_GRID_CLASS: Record<number, string> = {
+  2: "md:grid-cols-2",
+  3: "md:grid-cols-3",
+  4: "md:grid-cols-2 lg:grid-cols-4",
+};
 
 export default function RiskDashboard() {
   const [profiles, setProfiles] = useState<EnterpriseProfile[]>([]);
@@ -485,12 +494,47 @@ export default function RiskDashboard() {
                     )}cr · ${selected.profile.buyer_payment.stress_flag}`}
                   />
                 )}
+                {selected.profile.wris_climate && (
+                  <Stat
+                    icon={Database}
+                    label={`Real Rainfall (${selected.profile.wris_climate.district})`}
+                    value={
+                      selected.profile.wris_climate.rainfall_mm_total != null
+                        ? `${selected.profile.wris_climate.rainfall_mm_total.toFixed(
+                            0
+                          )}mm`
+                        : "N/A"
+                    }
+                  />
+                )}
+                {selected.profile.wris_climate && (
+                  <Stat
+                    icon={Droplets}
+                    label="Real Groundwater Depth"
+                    value={
+                      selected.profile.wris_climate.groundwater_avg_level_m != null
+                        ? `${selected.profile.wris_climate.groundwater_avg_level_m.toFixed(
+                            1
+                          )}m`
+                        : "N/A"
+                    }
+                  />
+                )}
               </div>
               {selected.profile.buyer_payment && (
                 <p className="mt-3 text-xs text-onyx/40">
                   Buyer payment exposure figures are mock placeholders (
                   {selected.profile.buyer_payment.mill_name}) pending real
                   Mills/Catchment/Exposure data.
+                </p>
+              )}
+              {selected.profile.wris_climate && (
+                <p className="mt-1 text-xs text-onyx/40">
+                  Rainfall/groundwater are real India-WRIS station data (
+                  {selected.profile.wris_climate.period_start} to{" "}
+                  {selected.profile.wris_climate.period_end}), district-level only -
+                  not yet the same source as the NDVI/soil-moisture/rainfall-deviation
+                  figures above, which are still synthetic.
                 </p>
               )}
             </Reveal>
@@ -535,9 +579,11 @@ export default function RiskDashboard() {
               <>
                 <Reveal
                   className={`grid grid-cols-1 gap-6 ${
-                    assessment.buyer_payment_risk_impact
-                      ? "md:grid-cols-3"
-                      : "md:grid-cols-2"
+                    SUMMARY_CARD_GRID_CLASS[
+                      2 +
+                        (assessment.buyer_payment_risk_impact ? 1 : 0) +
+                        (assessment.wris_climate_note ? 1 : 0)
+                    ]
                   }`}
                 >
                   <SummaryCard
@@ -555,6 +601,13 @@ export default function RiskDashboard() {
                       icon={Landmark}
                       title="Buyer Payment Risk"
                       body={assessment.buyer_payment_risk_impact}
+                    />
+                  )}
+                  {assessment.wris_climate_note && (
+                    <SummaryCard
+                      icon={Database}
+                      title="Real Ground-Observation Climate"
+                      body={assessment.wris_climate_note}
                     />
                   )}
                 </Reveal>

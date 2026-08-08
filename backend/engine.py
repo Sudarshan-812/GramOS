@@ -47,6 +47,15 @@ synchronize a cash-flow shock across an entire grower catchment simultaneously, 
 often invisible to crop-health/satellite monitoring. Respond with a concise analytical paragraph. \
 Do not invent a risk score or classification."""
 
+WRIS_CLIMATE_SYSTEM_PROMPT = """You are a rural credit risk analyst at a rural development \
+finance institution. Given REAL ground-observation data (rain gauge readings, groundwater \
+borewell depth, and/or soil moisture) sourced from India-WRIS government monitoring stations for \
+an enterprise's district, briefly note what this real data corroborates or contradicts about the \
+enterprise's forward climate risk, and flag the most physically meaningful signal (e.g. a deep or \
+declining groundwater level is a leading indicator of irrigation/drinking-water stress even in a \
+normal-rainfall period). Be explicit that this is real station data, not a modeled estimate. \
+Respond with a concise analytical paragraph. Do not invent a risk score or classification."""
+
 SYNTHESIS_SYSTEM_PROMPT = """You are a senior agricultural credit risk analyst at a rural \
 development finance institution, producing the final institutional-grade Non-Performing Asset \
 (NPA) risk assessment for an enterprise.
@@ -57,11 +66,12 @@ second-guess this score; copy it exactly into risk_score, and derive risk_classi
 using these bands: LOW (0-24), MEDIUM (25-49), HIGH (50-74), CRITICAL (75-100).
 
 Your job is to write the explainable narrative: financial_health_summary, climate_risk_impact, \
-buyer_payment_risk_impact, and actionable_mitigation_steps, grounded in the financial, climate, \
-and buyer payment analyses you are given below (buyer payment analysis may be absent — in that \
-case write "No buyer payment risk data available for this enterprise." for that field verbatim). \
-Focus entirely on producing clear, well-reasoned prose and concrete mitigation actions; the \
-numeric score is not yours to compute."""
+buyer_payment_risk_impact, wris_climate_note, and actionable_mitigation_steps, grounded in the \
+financial, climate, buyer payment, and real ground-observation analyses you are given below \
+(buyer payment and ground-observation analyses may be absent — in that case write the exact \
+"No ... data available for this enterprise." placeholder you were given for that field). Focus \
+entirely on producing clear, well-reasoned prose and concrete mitigation actions; the numeric \
+score is not yours to compute."""
 
 
 class GraphState(TypedDict):
@@ -69,6 +79,7 @@ class GraphState(TypedDict):
     climate_analysis: str
     financial_analysis: str
     buyer_payment_analysis: str
+    wris_climate_analysis: str
     deterministic_score: int
     final_assessment: RiskAssessmentResponse
 
@@ -165,10 +176,41 @@ behavior."""
     return {"buyer_payment_analysis": response.content}
 
 
+async def analyze_wris_climate(state: GraphState) -> dict:
+    w = state["request"].wris_climate
+    if w is None:
+        return {"wris_climate_analysis": "No real ground-observation data available for this enterprise's district."}
+
+    prompt = f"""REAL GROUND-OBSERVATION DATA (India-WRIS, {w.source}):
+- District: {w.district}
+- Period: {w.period_start} to {w.period_end}
+- Rainfall (manual rain gauge total): {f"{w.rainfall_mm_total:.1f} mm across {w.rainfall_station_count} station(s)" if w.rainfall_mm_total is not None else "not available"}
+- Groundwater level: {f"{w.groundwater_avg_level_m:.1f} m average depth across {w.groundwater_station_count} station(s)" if w.groundwater_avg_level_m is not None else "not available"}
+- Soil moisture: {f"{w.soil_moisture_avg_pct:.1f}%" if w.soil_moisture_avg_pct is not None else "not available"}
+
+Business type: {state["request"].financials.business_type}
+
+Note what this real station data corroborates or contradicts about forward climate risk."""
+
+    llm = _build_llm()
+    response = await llm.ainvoke(
+        [SystemMessage(content=WRIS_CLIMATE_SYSTEM_PROMPT), HumanMessage(content=prompt)]
+    )
+    return {"wris_climate_analysis": response.content}
+
+
+# Provisional thresholds, not yet calibrated against a real loan book (same caveat as
+# buyer_payment stress_flag deductions) - deeper/more negative depth-to-water-level
+# means a drier, more stressed aquifer.
+GROUNDWATER_SEVERE_DEPTH_M = -20.0
+GROUNDWATER_MODERATE_DEPTH_M = -10.0
+
+
 async def calculate_base_score(state: GraphState) -> dict:
     f = state["request"].financials
     c = state["request"].climate
     bp = state["request"].buyer_payment
+    w = state["request"].wris_climate
 
     score = 100.0
     score -= f.days_past_due * 2.0
@@ -181,6 +223,11 @@ async def calculate_base_score(state: GraphState) -> dict:
             score -= 20.0
         elif bp.stress_flag == "MEDIUM":
             score -= 10.0
+    if w is not None and w.groundwater_avg_level_m is not None:
+        if w.groundwater_avg_level_m <= GROUNDWATER_SEVERE_DEPTH_M:
+            score -= 15.0
+        elif w.groundwater_avg_level_m <= GROUNDWATER_MODERATE_DEPTH_M:
+            score -= 7.0
 
     # `score` is remaining health (100 = perfect); risk_score is its inverse, clamped to [0, 100].
     deterministic_score = int(min(100, max(0, round(100.0 - score))))
@@ -200,6 +247,9 @@ CLIMATE ANALYSIS:
 
 BUYER PAYMENT RISK ANALYSIS:
 {state["buyer_payment_analysis"]}
+
+REAL GROUND-OBSERVATION CLIMATE ANALYSIS:
+{state["wris_climate_analysis"]}
 
 DETERMINISTIC RISK SCORE (calculated by an auditable math model; use this exact value as \
 risk_score, do not recompute it): {state["deterministic_score"]}
@@ -222,6 +272,9 @@ Produce the full structured risk assessment now."""
     final_assessment.risk_score = state["deterministic_score"]
     final_assessment.buyer_payment_risk_impact = (
         state["buyer_payment_analysis"] if request.buyer_payment is not None else None
+    )
+    final_assessment.wris_climate_note = (
+        state["wris_climate_analysis"] if request.wris_climate is not None else None
     )
     if final_assessment.risk_score >= 75:
         final_assessment.risk_classification = "CRITICAL"
@@ -389,17 +442,20 @@ def _build_graph():
     graph.add_node("analyze_climate", analyze_climate)
     graph.add_node("analyze_financials", analyze_financials)
     graph.add_node("analyze_buyer_payment_risk", analyze_buyer_payment_risk)
+    graph.add_node("analyze_wris_climate", analyze_wris_climate)
     graph.add_node("calculate_base_score", calculate_base_score)
     graph.add_node("synthesize_risk", synthesize_risk)
 
     graph.add_edge(START, "analyze_climate")
     graph.add_edge(START, "analyze_financials")
     graph.add_edge(START, "analyze_buyer_payment_risk")
+    graph.add_edge(START, "analyze_wris_climate")
     graph.add_edge(START, "calculate_base_score")
 
     graph.add_edge("analyze_climate", "synthesize_risk")
     graph.add_edge("analyze_financials", "synthesize_risk")
     graph.add_edge("analyze_buyer_payment_risk", "synthesize_risk")
+    graph.add_edge("analyze_wris_climate", "synthesize_risk")
     graph.add_edge("calculate_base_score", "synthesize_risk")
 
     graph.add_edge("synthesize_risk", END)

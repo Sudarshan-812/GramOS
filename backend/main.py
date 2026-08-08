@@ -32,6 +32,7 @@ from models import (
     OverrideScoreRequest,
     RiskAssessmentRequest,
     RiskAssessmentResponse,
+    WrisClimateSnapshot,
 )
 from worker import check_climate_thresholds
 
@@ -156,6 +157,45 @@ _MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME: dict[str, BuyerPaymentProfile] = {
     ),
 }
 
+# Real (not mock) India-WRIS ground-observation data - see backend/wris_client.py and
+# backend/scripts/fetch_wris_climate_data.py, which produced this file. There is no
+# database table for it yet either, so this loads the same JSON snapshot the script
+# saved rather than duplicating the numbers inline. Enterprise -> district mapping is
+# hardcoded here the same way buyer_payment's enterprise -> taluk mapping is.
+_WRIS_DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "Ref_data", "wris_climate_data.json")
+_ENTERPRISE_TO_WRIS_DISTRICT: dict[str, str] = {
+    "Satti Cane Growers Cooperative (Athani)": "Belagavi",
+}
+
+
+def _load_wris_snapshots() -> dict[str, WrisClimateSnapshot]:
+    try:
+        with open(_WRIS_DATA_PATH, encoding="utf-8") as f:
+            raw = json.load(f)
+    except FileNotFoundError:
+        logger.warning("wris_climate_data.json not found at %s; wris_climate will be omitted", _WRIS_DATA_PATH)
+        return {}
+
+    snapshots: dict[str, WrisClimateSnapshot] = {}
+    for district, datasets in raw.items():
+        rainfall = (datasets.get("rainfall") or {}).get("summary") or {}
+        groundwater = (datasets.get("groundwater") or {}).get("summary") or {}
+        soil_moisture = (datasets.get("soil_moisture") or {}).get("summary") or {}
+        snapshots[district] = WrisClimateSnapshot(
+            district=district,
+            period_start="2025-06-01",
+            period_end="2025-06-30",
+            rainfall_mm_total=rainfall.get("total_mm"),
+            rainfall_station_count=len(rainfall.get("stations", [])),
+            groundwater_avg_level_m=groundwater.get("avg_level_m"),
+            groundwater_station_count=len(groundwater.get("stations", [])),
+            soil_moisture_avg_pct=soil_moisture.get("avg_pct"),
+        )
+    return snapshots
+
+
+_WRIS_SNAPSHOTS_BY_DISTRICT = _load_wris_snapshots()
+
 
 @app.get(
     "/api/mock-profiles/{profile_key}",
@@ -211,6 +251,9 @@ def get_mock_profile(profile_key: str):
             alpha_earth_embeddings=_synthetic_alpha_earth_embeddings(profile_key),
         ),
         buyer_payment=_MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME.get(enterprise["name"]),
+        wris_climate=_WRIS_SNAPSHOTS_BY_DISTRICT.get(
+            _ENTERPRISE_TO_WRIS_DISTRICT.get(enterprise["name"], "")
+        ),
     )
 
 

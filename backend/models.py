@@ -39,11 +39,33 @@ class BuyerPaymentProfile(BaseModel):
     confidence: str = Field(..., description="Data confidence: High, Medium, Low")
 
 
+class WrisClimateSnapshot(BaseModel):
+    """Real ground-observation data from the India-WRIS API (indiawris.gov.in) for the
+    enterprise's district - distinct from ClimateProfile above, which is still
+    synthetic. Raw values, not a "deviation from normal" (no historical baseline has
+    been computed yet - see backend/scripts/fetch_wris_climate_data.py)."""
+
+    district: str
+    period_start: str
+    period_end: str
+    rainfall_mm_total: float | None = Field(
+        default=None, description="Summed manual rain-gauge readings (CWC), excluding telemetric/accumulated rows"
+    )
+    rainfall_station_count: int = 0
+    groundwater_avg_level_m: float | None = Field(
+        default=None, description="Average depth-to-water-level in meters (CGWB); more negative = deeper/drier"
+    )
+    groundwater_station_count: int = 0
+    soil_moisture_avg_pct: float | None = None
+    source: str = "India-WRIS"
+
+
 class RiskAssessmentRequest(BaseModel):
     enterprise_name: str
     financials: FinancialProfile
     climate: ClimateProfile
     buyer_payment: BuyerPaymentProfile | None = None
+    wris_climate: WrisClimateSnapshot | None = None
 
 
 class RiskAssessmentResponse(BaseModel):
@@ -53,6 +75,9 @@ class RiskAssessmentResponse(BaseModel):
     climate_risk_impact: str
     buyer_payment_risk_impact: str | None = Field(
         default=None, description="Mill/buyer payment risk narrative; null when no buyer_payment data was supplied"
+    )
+    wris_climate_note: str | None = Field(
+        default=None, description="Real ground-observation climate narrative; null when no wris_climate data was supplied"
     )
     actionable_mitigation_steps: list[str]
     is_cached_fallback: bool = Field(

@@ -1,6 +1,12 @@
-"""One-off preview: run the risk engine with a MOCK buyer_payment_risk signal so the
-buyer_payment_risk_impact wiring can be eyeballed before real Mills/Catchment/Exposure data
-exists. Not imported by the live app. Run from backend/: python scripts/preview_buyer_payment_risk.py
+"""One-off preview: run the risk engine with a MOCK buyer_payment_risk signal and REAL
+wris_climate data so both can be eyeballed together. buyer_payment is still a placeholder
+(real Mills/Catchment/Exposure data isn't sourced yet); wris_climate is real India-WRIS
+data for Belagavi, June 2025 (see backend/scripts/fetch_wris_climate_data.py). Not
+imported by the live app. Run from backend/: python scripts/preview_buyer_payment_risk.py
+
+Each run costs 5 Gemini calls (climate, financial, buyer-payment, wris-climate, synthesis)
+against the free-tier's 20/day quota - don't run this repeatedly while testing something
+else, it'll exhaust the day's budget fast (this has already happened once in this project).
 """
 import asyncio
 import json
@@ -14,7 +20,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from engine import risk_graph
-from models import BuyerPaymentProfile, ClimateProfile, FinancialProfile, RiskAssessmentRequest
+from models import (
+    BuyerPaymentProfile,
+    ClimateProfile,
+    FinancialProfile,
+    RiskAssessmentRequest,
+    WrisClimateSnapshot,
+)
 
 MOCK_REQUEST = RiskAssessmentRequest(
     enterprise_name="Satti Cane Growers Cooperative (Athani)",
@@ -38,6 +50,16 @@ MOCK_REQUEST = RiskAssessmentRequest(
         weighted_exposure_cr=132.0,
         stress_flag="HIGH",
         confidence="Low",
+    ),
+    wris_climate=WrisClimateSnapshot(
+        district="Belagavi",
+        period_start="2025-06-01",
+        period_end="2025-06-30",
+        rainfall_mm_total=240.7,
+        rainfall_station_count=3,
+        groundwater_avg_level_m=-9.2,
+        groundwater_station_count=17,
+        soil_moisture_avg_pct=None,
     ),
 )
 

@@ -7,7 +7,13 @@ init_supabase.py and seed_dynamic_data.py, and is not imported anywhere in the l
 
 import random
 
-from models import BuyerPaymentProfile, ClimateProfile, FinancialProfile, RiskAssessmentRequest
+from models import (
+    BuyerPaymentProfile,
+    ClimateProfile,
+    FinancialProfile,
+    RiskAssessmentRequest,
+    WrisClimateSnapshot,
+)
 
 
 def _mock_embeddings(seed: int) -> list[float]:
@@ -97,6 +103,21 @@ def sugarcane_grower_cooperative_buyer_payment_risk() -> RiskAssessmentRequest:
             weighted_exposure_cr=132.0,
             stress_flag="HIGH",
             confidence="Low",
+        ),
+        # REAL data (unlike buyer_payment above) - India-WRIS, Belagavi district, June 2025.
+        # See backend/wris_client.py + backend/scripts/fetch_wris_climate_data.py, which
+        # produced Ref_data/wris_climate_data.json; these numbers are that file's Belagavi
+        # entry as of 2026-08-08, copied here rather than loaded so this stays a pure literal
+        # demo fixture like the rest of this function.
+        wris_climate=WrisClimateSnapshot(
+            district="Belagavi",
+            period_start="2025-06-01",
+            period_end="2025-06-30",
+            rainfall_mm_total=240.7,
+            rainfall_station_count=3,
+            groundwater_avg_level_m=-9.2,
+            groundwater_station_count=17,
+            soil_moisture_avg_pct=None,
         ),
     )
 
