@@ -51,7 +51,12 @@ ALLOWED_DOCUMENT_MIME_TYPES = {
 
 logger = logging.getLogger("gramos")
 
-ASSESS_RISK_TIMEOUT_SECONDS = 4.5
+# Was 4.5s, tuned when the graph had 3 Gemini calls (2 parallel + synthesis). Now 5
+# calls (4 parallel analysis nodes + a synthesis prompt that includes all 4 of their
+# outputs, so it's slower too) - 4.5s was confirmed too tight over a real network
+# connection on 2026-08-08 (timed out even on gemini-3.1-flash-lite), silently
+# degrading every assessment to the generic golden fallback.
+ASSESS_RISK_TIMEOUT_SECONDS = 15.0
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 

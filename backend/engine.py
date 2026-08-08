@@ -10,7 +10,28 @@ from langgraph.graph import StateGraph, START, END
 
 from models import RiskAssessmentRequest, RiskAssessmentResponse
 
-MODEL_NAME = "gemini-2.5-flash"
+
+def _text_content(content: str | list) -> str:
+    """ChatGoogleGenerativeAI.ainvoke().content is a plain str for some models
+    (gemini-2.5-flash) but a list of content blocks for others (gemini-3.1-flash-lite
+    returns [{"type": "text", "text": ..., "extras": {"signature": ...}}]) - normalize
+    to plain text so it's safe to store directly on a str-typed response field."""
+    if isinstance(content, str):
+        return content
+    parts = []
+    for block in content:
+        if isinstance(block, dict) and block.get("type") == "text":
+            parts.append(block.get("text", ""))
+        elif isinstance(block, str):
+            parts.append(block)
+    return "".join(parts)
+
+# gemini-2.5-flash's free tier is 20 requests/day - each risk assessment costs 5 calls
+# (4 parallel analysis nodes + synthesis), so that's ~4 assessments/day, which the demo
+# blew through during testing on 2026-08-08. gemini-3.1-flash-lite gives 500 RPD / 15 RPM
+# on the same free tier (vs 20/5) - 25x the daily budget, and it's not the deprecated
+# gemini-2.5-flash-lite (that one is also RPD 20 and sunsets Oct 2026 anyway).
+MODEL_NAME = "gemini-3.1-flash-lite"
 
 DOCUMENT_EXTRACTION_PROMPT = """You are an expert credit underwriter at a rural development \
 finance institution, reviewing a document (bank statement, KCC passbook, invoice, receipt, land \
@@ -130,7 +151,7 @@ Analyze the forward climate risk to this enterprise's revenue."""
     response = await llm.ainvoke(
         [SystemMessage(content=CLIMATE_SYSTEM_PROMPT), HumanMessage(content=prompt)]
     )
-    return {"climate_analysis": response.content}
+    return {"climate_analysis": _text_content(response.content)}
 
 
 async def analyze_financials(state: GraphState) -> dict:
@@ -149,7 +170,7 @@ Analyze this enterprise's current cash flow health and repayment discipline."""
     response = await llm.ainvoke(
         [SystemMessage(content=FINANCIAL_SYSTEM_PROMPT), HumanMessage(content=prompt)]
     )
-    return {"financial_analysis": response.content}
+    return {"financial_analysis": _text_content(response.content)}
 
 
 async def analyze_buyer_payment_risk(state: GraphState) -> dict:
@@ -173,7 +194,7 @@ behavior."""
     response = await llm.ainvoke(
         [SystemMessage(content=BUYER_PAYMENT_SYSTEM_PROMPT), HumanMessage(content=prompt)]
     )
-    return {"buyer_payment_analysis": response.content}
+    return {"buyer_payment_analysis": _text_content(response.content)}
 
 
 async def analyze_wris_climate(state: GraphState) -> dict:
@@ -196,7 +217,7 @@ Note what this real station data corroborates or contradicts about forward clima
     response = await llm.ainvoke(
         [SystemMessage(content=WRIS_CLIMATE_SYSTEM_PROMPT), HumanMessage(content=prompt)]
     )
-    return {"wris_climate_analysis": response.content}
+    return {"wris_climate_analysis": _text_content(response.content)}
 
 
 # Provisional thresholds, not yet calibrated against a real loan book (same caveat as
