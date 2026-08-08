@@ -76,11 +76,15 @@ def sugarcane_grower_cooperative_buyer_payment_risk() -> RiskAssessmentRequest:
     the same way analyze_climate threatens it for the dairy cooperative above - a shock
     invisible to financial ledgers or crop-health monitoring alone.
 
-    Mill identity is now confirmed (Krishna SSK Ltd., M009 - the founder's own family's
-    mill, per Field_Notes N001), but the dues/arrears FIGURES are still MOCK PLACEHOLDERS -
-    real Belagavi/Bagalkote/Vijayapura mill arrears data is still being sourced via RTI and
-    Mills/Catchment/Exposure tabs in Ref_data/GramOS_Cane_Arrears_Dataset_v1.xlsx. Swap the
-    BuyerPaymentProfile below out once that's ready.
+    Buyer identity is now confirmed (Shri Brahmanand Sagar Jaggery Industries, Alagawadi,
+    Raibag taluk - the founder's own family's actual buyer, per Field_Notes N001; corrected
+    2026-08-08, an earlier "Krishna SSK Ltd" identification was wrong/stale). Note this is a
+    jaggery (gur) unit, not a Cane-Commissionerate-regulated sugar mill - it's likely outside
+    the scope of the sugar-mill RTI and the S02-sourced Mills tab entirely, so the usual
+    Mills/Catchment/Exposure RTI sourcing path in Ref_data/GramOS_Cane_Arrears_Dataset_v1.xlsx
+    may not apply to this specific buyer. The dues/arrears FIGURES below are still MOCK
+    PLACEHOLDERS regardless. Swap the BuyerPaymentProfile below out once real data (via
+    whatever sourcing route ends up applying to jaggery units) is ready.
     """
     return RiskAssessmentRequest(
         enterprise_name="Satti Cane Growers Cooperative (Athani)",
@@ -100,7 +104,14 @@ def sugarcane_grower_cooperative_buyer_payment_risk() -> RiskAssessmentRequest:
         ),
         buyer_payment=BuyerPaymentProfile(
             taluk="Athani",
-            mill_name="Krishna SSK Ltd. (M009, confirmed 2026-08-08) - [MOCK dues/arrears figures, real numbers still pending RTI/sourcing]",
+            mill_name=(
+                "Shri Brahmanand Sagar Jaggery Industries (Alagawadi, Raibag taluk - corrected "
+                "2026-08-08, supersedes the earlier wrong 'Krishna SSK Ltd' identification, which "
+                "was based on stale 2023 info) - a jaggery/gur unit, NOT a Cane-Commissionerate-"
+                "regulated sugar mill, so it is likely outside the sugar-mill RTI's scope. "
+                "[MOCK dues/arrears figures - real numbers not sourced, and the usual sugar-mill "
+                "RTI/S02 sourcing path probably does not apply to this buyer]"
+            ),
             weighted_exposure_cr=132.0,
             stress_flag="HIGH",
             confidence="Low",

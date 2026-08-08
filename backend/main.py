@@ -155,7 +155,14 @@ def _synthetic_alpha_earth_embeddings(enterprise_id: str) -> list[float]:
 _MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME: dict[str, BuyerPaymentProfile] = {
     "Satti Cane Growers Cooperative (Athani)": BuyerPaymentProfile(
         taluk="Athani",
-        mill_name="Krishna SSK Ltd. (M009, confirmed 2026-08-08) - [MOCK dues/arrears figures, real numbers still pending RTI/sourcing]",
+        mill_name=(
+            "Shri Brahmanand Sagar Jaggery Industries (Alagawadi, Raibag taluk - corrected "
+            "2026-08-08, supersedes the earlier wrong 'Krishna SSK Ltd' identification, which "
+            "was based on stale 2023 info) - a jaggery/gur unit, NOT a Cane-Commissionerate-"
+            "regulated sugar mill, so it is likely outside the sugar-mill RTI's scope. "
+            "[MOCK dues/arrears figures - real numbers not sourced, and the usual sugar-mill "
+            "RTI/S02 sourcing path probably does not apply to this buyer]"
+        ),
         weighted_exposure_cr=132.0,
         stress_flag="HIGH",
         confidence="Low",

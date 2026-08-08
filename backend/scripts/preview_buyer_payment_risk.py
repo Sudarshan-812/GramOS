@@ -46,7 +46,12 @@ MOCK_REQUEST = RiskAssessmentRequest(
     ),
     buyer_payment=BuyerPaymentProfile(
         taluk="Athani",
-        mill_name="Krishna SSK Ltd. (M009, confirmed 2026-08-08) - [MOCK dues/arrears figures, real numbers still pending RTI/sourcing]",
+        mill_name=(
+            "Shri Brahmanand Sagar Jaggery Industries (Alagawadi, Raibag taluk - corrected "
+            "2026-08-08, supersedes the earlier wrong 'Krishna SSK Ltd' identification) - a "
+            "jaggery/gur unit, NOT a Cane-Commissionerate-regulated sugar mill. "
+            "[MOCK dues/arrears figures - real numbers not sourced]"
+        ),
         weighted_exposure_cr=132.0,
         stress_flag="HIGH",
         confidence="Low",
