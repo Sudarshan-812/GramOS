@@ -136,6 +136,17 @@ export default function LoginPage() {
                 )}
               </button>
             </form>
+
+            <p className="mt-4 text-center text-sm text-onyx/50">
+              Don&rsquo;t have an account?{" "}
+              <a
+                href="/contact"
+                className="font-medium text-lime-700 hover:text-lime-800"
+              >
+                Contact us
+              </a>{" "}
+              for access.
+            </p>
           </>
         ) : (
           <>
