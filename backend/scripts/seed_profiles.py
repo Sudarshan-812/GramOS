@@ -76,7 +76,8 @@ def sugarcane_grower_cooperative_buyer_payment_risk() -> RiskAssessmentRequest:
     the same way analyze_climate threatens it for the dairy cooperative above - a shock
     invisible to financial ledgers or crop-health monitoring alone.
 
-    buyer_payment figures here are MOCK PLACEHOLDERS (see BuyerPaymentProfile.mill_name) -
+    Mill identity is now confirmed (Krishna SSK Ltd., M009 - the founder's own family's
+    mill, per Field_Notes N001), but the dues/arrears FIGURES are still MOCK PLACEHOLDERS -
     real Belagavi/Bagalkote/Vijayapura mill arrears data is still being sourced via RTI and
     Mills/Catchment/Exposure tabs in Ref_data/GramOS_Cane_Arrears_Dataset_v1.xlsx. Swap the
     BuyerPaymentProfile below out once that's ready.
@@ -99,7 +100,7 @@ def sugarcane_grower_cooperative_buyer_payment_risk() -> RiskAssessmentRequest:
         ),
         buyer_payment=BuyerPaymentProfile(
             taluk="Athani",
-            mill_name="[MOCK - mill unconfirmed, pending village visit] Athani-taluk mill",
+            mill_name="Krishna SSK Ltd. (M009, confirmed 2026-08-08) - [MOCK dues/arrears figures, real numbers still pending RTI/sourcing]",
             weighted_exposure_cr=132.0,
             stress_flag="HIGH",
             confidence="Low",

@@ -155,7 +155,7 @@ def _synthetic_alpha_earth_embeddings(enterprise_id: str) -> list[float]:
 _MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME: dict[str, BuyerPaymentProfile] = {
     "Satti Cane Growers Cooperative (Athani)": BuyerPaymentProfile(
         taluk="Athani",
-        mill_name="[MOCK - mill unconfirmed, pending village visit] Athani-taluk mill",
+        mill_name="Krishna SSK Ltd. (M009, confirmed 2026-08-08) - [MOCK dues/arrears figures, real numbers still pending RTI/sourcing]",
         weighted_exposure_cr=132.0,
         stress_flag="HIGH",
         confidence="Low",
