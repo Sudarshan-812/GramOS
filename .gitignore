@@ -16,3 +16,7 @@ Thumbs.db
 
 # Local tool state
 .claude/
+
+# Reference data (not part of the app)
+des_Ref/
+Ref_data/
