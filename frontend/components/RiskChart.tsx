@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 import {
-  AreaChart as AreaChartIcon,
   BarChart3 as BarChartIcon,
   LineChart as LineChartIcon,
   Radar as RadarIcon,
@@ -35,11 +34,10 @@ const FONT = "inherit";
 const PROJECTION_MONTHS = 6;
 const DAYS_PER_MONTH = 30;
 
-type ChartMode = "line" | "area" | "bar" | "radar";
+type ChartMode = "line" | "bar" | "radar";
 
 const CHART_MODES: { id: ChartMode; label: string; icon: typeof LineChartIcon }[] = [
   { id: "line", label: "Line", icon: LineChartIcon },
-  { id: "area", label: "Area", icon: AreaChartIcon },
   { id: "bar", label: "Bar", icon: BarChartIcon },
   { id: "radar", label: "Risk Profile", icon: RadarIcon },
 ];
@@ -49,11 +47,6 @@ const MODE_META: Record<ChartMode, { title: string; subtitle: string }> = {
     title: "30-Day History & 6-Month Cash Flow Projection",
     subtitle:
       "Day −30 to today: actual revenue & NDVI trend from Supabase. Months +1–6: projected against climate stress signals.",
-  },
-  area: {
-    title: "Cash Flow Trend",
-    subtitle:
-      "Filled view of actual and projected monthly revenue against the critical cash flow threshold.",
   },
   bar: {
     title: "Revenue Outlook by Month",
@@ -504,112 +497,6 @@ function LineView({ financials, climate, historyData }: RiskChartProps) {
   );
 }
 
-function AreaView({ financials, climate, historyData }: RiskChartProps) {
-  const { isCritical, series, options } = useMemo(() => {
-    const { data, criticalThreshold, isCritical, minDayOffset } = buildTimeline(
-      financials,
-      climate,
-      historyData
-    );
-    const values = data.flatMap((d) => [d.actual, d.projected]).filter((v): v is number => v != null);
-    const minValue = Math.min(...values, criticalThreshold);
-    const maxValue = Math.max(...values);
-    const yTicks = niceTicks(minValue - (maxValue - minValue) * 0.1, maxValue, 5);
-    const yDomain: [number, number] = [yTicks[0], yTicks[yTicks.length - 1]];
-
-    const series = [
-      { name: "Actual Revenue", data: data.map((d) => ({ x: d.dayOffset, y: d.actual })) },
-      { name: "Projected Revenue", data: data.map((d) => ({ x: d.dayOffset, y: d.projected })) },
-    ];
-
-    const options: ApexOptions = {
-      chart: {
-        type: "area",
-        fontFamily: FONT,
-        toolbar: { show: false },
-        zoom: { enabled: false },
-        animations: { enabled: true, speed: 500 },
-      },
-      colors: [COLORS.emerald, COLORS.slate],
-      stroke: { curve: "straight", width: [2, 2], dashArray: [0, 6] },
-      fill: {
-        type: "gradient",
-        gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0, stops: [0, 90, 100] },
-      },
-      grid: { borderColor: COLORS.grid, strokeDashArray: 3 },
-      markers: { size: 0 },
-      xaxis: {
-        type: "numeric",
-        min: minDayOffset,
-        max: PROJECTION_MONTHS * DAYS_PER_MONTH,
-        tickAmount: 7,
-        labels: {
-          formatter: (v) => formatDayOffset(Number(v)),
-          style: { colors: COLORS.muted, fontSize: "12px" },
-        },
-        axisBorder: { color: COLORS.grid },
-        axisTicks: { color: COLORS.grid },
-      },
-      yaxis: {
-        min: yDomain[0],
-        max: yDomain[1],
-        tickAmount: 4,
-        labels: { formatter: (v) => formatINR(v), style: { colors: COLORS.muted, fontSize: "12px" } },
-      },
-      annotations: {
-        yaxis: [{ y: criticalThreshold, borderColor: COLORS.red, strokeDashArray: 4 }],
-      },
-      legend: { show: false },
-      tooltip: {
-        shared: true,
-        intersect: false,
-        custom: ({ dataPointIndex }: { dataPointIndex: number }) => {
-          const point = data[dataPointIndex];
-          if (!point) return "";
-          const rows: { color: string; text: string }[] = [];
-          if (point.actual != null) rows.push({ color: COLORS.emerald, text: `${formatINRFull(point.actual)} (Actual)` });
-          if (point.projected != null) rows.push({ color: COLORS.slate, text: `${formatINRFull(point.projected)} (Projected)` });
-          return tooltipShell(rows, formatDayOffset(point.dayOffset));
-        },
-      },
-    };
-
-    return { isCritical, series, options };
-  }, [financials, climate, historyData]);
-
-  return (
-    <>
-      <div className="flex flex-wrap items-center gap-4 text-xs text-onyx/50">
-        <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS.emerald }} />
-          Actual revenue
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: COLORS.slate }} />
-          Projected revenue
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span
-            className="h-0.5 w-4 border-t-2 border-dashed"
-            style={{ borderColor: COLORS.red }}
-          />
-          Critical threshold
-        </span>
-      </div>
-
-      {isCritical && (
-        <p className="mt-3 rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700">
-          Projected revenue falls below the critical cash flow threshold by month 6.
-        </p>
-      )}
-
-      <div className="mt-4 h-80 w-full sm:h-96">
-        <ApexChart options={options} series={series} type="area" height="100%" width="100%" />
-      </div>
-    </>
-  );
-}
-
 function BarView({ financials, climate, historyData }: RiskChartProps) {
   const { isCritical, series, options } = useMemo(() => {
     const { data, criticalThreshold, isCritical } = buildBarSeries(financials, climate, historyData);
@@ -791,7 +678,6 @@ export default function RiskChart(props: RiskChartProps) {
       </div>
 
       {mode === "line" && <LineView {...props} />}
-      {mode === "area" && <AreaView {...props} />}
       {mode === "bar" && <BarView {...props} />}
       {mode === "radar" && <RiskProfileView {...props} />}
     </div>
