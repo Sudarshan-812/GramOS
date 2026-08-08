@@ -9,6 +9,7 @@ import {
   CloudRain,
   Droplets,
   FileText,
+  Landmark,
   Loader2,
   Milk,
   PenLine,
@@ -91,7 +92,7 @@ function classifyRisk(score: number): RiskClassification {
 function enterpriseIcon(businessType: string) {
   const t = businessType.toLowerCase();
   if (t.includes("dairy")) return Milk;
-  if (t.includes("agri") || t.includes("retail")) return Sprout;
+  if (t.includes("cane") || t.includes("agri") || t.includes("retail")) return Sprout;
   if (t.includes("textile") || t.includes("handicraft") || t.includes("trader"))
     return Building2;
   return Building2;
@@ -475,7 +476,23 @@ export default function RiskDashboard() {
                       : ""
                   }${selected.profile.climate.rainfall_deviation_pct.toFixed(1)}%`}
                 />
+                {selected.profile.buyer_payment && (
+                  <Stat
+                    icon={Landmark}
+                    label={`Mill Arrears (${selected.profile.buyer_payment.taluk})`}
+                    value={`₹${selected.profile.buyer_payment.weighted_exposure_cr.toFixed(
+                      0
+                    )}cr · ${selected.profile.buyer_payment.stress_flag}`}
+                  />
+                )}
               </div>
+              {selected.profile.buyer_payment && (
+                <p className="mt-3 text-xs text-onyx/40">
+                  Buyer payment exposure figures are mock placeholders (
+                  {selected.profile.buyer_payment.mill_name}) pending real
+                  Mills/Catchment/Exposure data.
+                </p>
+              )}
             </Reveal>
 
             {/* Risk score: a standalone horizontal summary bar, not squeezed
@@ -516,7 +533,13 @@ export default function RiskDashboard() {
             {/* Assessment narrative */}
             {assessment && !assessing && (
               <>
-                <Reveal className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <Reveal
+                  className={`grid grid-cols-1 gap-6 ${
+                    assessment.buyer_payment_risk_impact
+                      ? "md:grid-cols-3"
+                      : "md:grid-cols-2"
+                  }`}
+                >
                   <SummaryCard
                     icon={Wallet}
                     title="Financial Health Summary"
@@ -527,6 +550,13 @@ export default function RiskDashboard() {
                     title="Climate Risk Impact"
                     body={assessment.climate_risk_impact}
                   />
+                  {assessment.buyer_payment_risk_impact && (
+                    <SummaryCard
+                      icon={Landmark}
+                      title="Buyer Payment Risk"
+                      body={assessment.buyer_payment_risk_impact}
+                    />
+                  )}
                 </Reveal>
 
                 <Reveal delay={80}>

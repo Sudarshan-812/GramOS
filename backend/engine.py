@@ -38,6 +38,15 @@ due, and Kisan Credit Card (KCC) utilization, reason about the enterprise's curr
 health and repayment discipline. Respond with a concise analytical paragraph. Do not invent a \
 risk score or classification."""
 
+BUYER_PAYMENT_SYSTEM_PROMPT = """You are a rural credit risk analyst at a rural development \
+finance institution, specializing in agricultural buyer/procurer payment behavior. Given a sugar \
+mill's cane payment arrears exposure for the taluk an enterprise operates in, reason about how a \
+delayed or defaulting buyer (the mill) plausibly threatens this enterprise's FUTURE cash flow — \
+even if the enterprise's own repayment record currently looks clean. Mill payment delays \
+synchronize a cash-flow shock across an entire grower catchment simultaneously, distinct from and \
+often invisible to crop-health/satellite monitoring. Respond with a concise analytical paragraph. \
+Do not invent a risk score or classification."""
+
 SYNTHESIS_SYSTEM_PROMPT = """You are a senior agricultural credit risk analyst at a rural \
 development finance institution, producing the final institutional-grade Non-Performing Asset \
 (NPA) risk assessment for an enterprise.
@@ -48,15 +57,18 @@ second-guess this score; copy it exactly into risk_score, and derive risk_classi
 using these bands: LOW (0-24), MEDIUM (25-49), HIGH (50-74), CRITICAL (75-100).
 
 Your job is to write the explainable narrative: financial_health_summary, climate_risk_impact, \
-and actionable_mitigation_steps, grounded in the financial analysis and climate analysis you are \
-given below. Focus entirely on producing clear, well-reasoned prose and concrete mitigation \
-actions; the numeric score is not yours to compute."""
+buyer_payment_risk_impact, and actionable_mitigation_steps, grounded in the financial, climate, \
+and buyer payment analyses you are given below (buyer payment analysis may be absent — in that \
+case write "No buyer payment risk data available for this enterprise." for that field verbatim). \
+Focus entirely on producing clear, well-reasoned prose and concrete mitigation actions; the \
+numeric score is not yours to compute."""
 
 
 class GraphState(TypedDict):
     request: RiskAssessmentRequest
     climate_analysis: str
     financial_analysis: str
+    buyer_payment_analysis: str
     deterministic_score: int
     final_assessment: RiskAssessmentResponse
 
@@ -129,9 +141,34 @@ Analyze this enterprise's current cash flow health and repayment discipline."""
     return {"financial_analysis": response.content}
 
 
+async def analyze_buyer_payment_risk(state: GraphState) -> dict:
+    bp = state["request"].buyer_payment
+    if bp is None:
+        return {"buyer_payment_analysis": "No buyer payment risk data available for this enterprise's taluk."}
+
+    prompt = f"""BUYER PAYMENT RISK PROFILE (mill cane-arrears exposure):
+- Taluk: {bp.taluk}
+- Primary mill: {bp.mill_name}
+- Weighted arrears exposure: Rs {bp.weighted_exposure_cr:.1f} crore
+- Stress flag: {bp.stress_flag}
+- Data confidence: {bp.confidence}
+
+Business type: {state["request"].financials.business_type}
+
+Analyze the forward cash-flow risk to this enterprise from its exposure to this mill's payment \
+behavior."""
+
+    llm = _build_llm()
+    response = await llm.ainvoke(
+        [SystemMessage(content=BUYER_PAYMENT_SYSTEM_PROMPT), HumanMessage(content=prompt)]
+    )
+    return {"buyer_payment_analysis": response.content}
+
+
 async def calculate_base_score(state: GraphState) -> dict:
     f = state["request"].financials
     c = state["request"].climate
+    bp = state["request"].buyer_payment
 
     score = 100.0
     score -= f.days_past_due * 2.0
@@ -139,6 +176,11 @@ async def calculate_base_score(state: GraphState) -> dict:
         score -= abs(c.rainfall_deviation_pct) * 0.5
     if f.kcc_utilization_pct > 80.0:
         score -= 10.0
+    if bp is not None:
+        if bp.stress_flag == "HIGH":
+            score -= 20.0
+        elif bp.stress_flag == "MEDIUM":
+            score -= 10.0
 
     # `score` is remaining health (100 = perfect); risk_score is its inverse, clamped to [0, 100].
     deterministic_score = int(min(100, max(0, round(100.0 - score))))
@@ -156,6 +198,9 @@ FINANCIAL ANALYSIS:
 CLIMATE ANALYSIS:
 {state["climate_analysis"]}
 
+BUYER PAYMENT RISK ANALYSIS:
+{state["buyer_payment_analysis"]}
+
 DETERMINISTIC RISK SCORE (calculated by an auditable math model; use this exact value as \
 risk_score, do not recompute it): {state["deterministic_score"]}
 
@@ -172,8 +217,12 @@ Produce the full structured risk assessment now."""
     else:
         final_assessment = RiskAssessmentResponse.model_validate(response)
 
-    # Enforce the deterministic score as the source of truth regardless of what the LLM returned.
+    # Enforce the deterministic score and the buyer-payment narrative as the source of truth
+    # regardless of what the LLM returned (same pattern as risk_score below).
     final_assessment.risk_score = state["deterministic_score"]
+    final_assessment.buyer_payment_risk_impact = (
+        state["buyer_payment_analysis"] if request.buyer_payment is not None else None
+    )
     if final_assessment.risk_score >= 75:
         final_assessment.risk_classification = "CRITICAL"
     elif final_assessment.risk_score >= 50:
@@ -339,15 +388,18 @@ def _build_graph():
     graph = StateGraph(GraphState)
     graph.add_node("analyze_climate", analyze_climate)
     graph.add_node("analyze_financials", analyze_financials)
+    graph.add_node("analyze_buyer_payment_risk", analyze_buyer_payment_risk)
     graph.add_node("calculate_base_score", calculate_base_score)
     graph.add_node("synthesize_risk", synthesize_risk)
 
     graph.add_edge(START, "analyze_climate")
     graph.add_edge(START, "analyze_financials")
+    graph.add_edge(START, "analyze_buyer_payment_risk")
     graph.add_edge(START, "calculate_base_score")
 
     graph.add_edge("analyze_climate", "synthesize_risk")
     graph.add_edge("analyze_financials", "synthesize_risk")
+    graph.add_edge("analyze_buyer_payment_risk", "synthesize_risk")
     graph.add_edge("calculate_base_score", "synthesize_risk")
 
     graph.add_edge("synthesize_risk", END)

@@ -7,7 +7,7 @@ init_supabase.py and seed_dynamic_data.py, and is not imported anywhere in the l
 
 import random
 
-from models import ClimateProfile, FinancialProfile, RiskAssessmentRequest
+from models import BuyerPaymentProfile, ClimateProfile, FinancialProfile, RiskAssessmentRequest
 
 
 def _mock_embeddings(seed: int) -> list[float]:
@@ -62,6 +62,45 @@ def agri_input_retailer_stable_season() -> RiskAssessmentRequest:
     )
 
 
+def sugarcane_grower_cooperative_buyer_payment_risk() -> RiskAssessmentRequest:
+    """A cane-grower cooperative exposed to a mill with a HIGH arrears stress flag.
+
+    Demo case for buyer_payment_risk: repayment history still looks manageable, but the
+    mill this taluk's growers sell to is deep in arrears, which threatens future cash flow
+    the same way analyze_climate threatens it for the dairy cooperative above - a shock
+    invisible to financial ledgers or crop-health monitoring alone.
+
+    buyer_payment figures here are MOCK PLACEHOLDERS (see BuyerPaymentProfile.mill_name) -
+    real Belagavi/Bagalkote/Vijayapura mill arrears data is still being sourced via RTI and
+    Mills/Catchment/Exposure tabs in Ref_data/GramOS_Cane_Arrears_Dataset_v1.xlsx. Swap the
+    BuyerPaymentProfile below out once that's ready.
+    """
+    return RiskAssessmentRequest(
+        enterprise_name="Satti Cane Growers Cooperative (Athani)",
+        financials=FinancialProfile(
+            business_type="Sugarcane Grower Cooperative",
+            monthly_revenue_inr=240_000.0,
+            upi_transaction_count=140,
+            avg_ticket_size_inr=1_700.0,
+            days_past_due=12,
+            kcc_utilization_pct=68.0,
+        ),
+        climate=ClimateProfile(
+            ndvi_index=0.62,
+            soil_moisture_percentage=38.0,
+            rainfall_deviation_pct=-6.0,
+            alpha_earth_embeddings=_mock_embeddings(seed=4),
+        ),
+        buyer_payment=BuyerPaymentProfile(
+            taluk="Athani",
+            mill_name="[MOCK - mill unconfirmed, pending village visit] Athani-taluk mill",
+            weighted_exposure_cr=132.0,
+            stress_flag="HIGH",
+            confidence="Low",
+        ),
+    )
+
+
 def handicraft_trader_late_payments() -> RiskAssessmentRequest:
     """A non-agricultural trader already showing repayment stress, climate-neutral."""
     return RiskAssessmentRequest(
@@ -86,5 +125,6 @@ def handicraft_trader_late_payments() -> RiskAssessmentRequest:
 MOCK_PROFILES = {
     "dairy-cooperative-fodder-shortage": dairy_cooperative_fodder_shortage,
     "agri-input-retailer-stable-season": agri_input_retailer_stable_season,
+    "sugarcane-grower-cooperative-buyer-payment-risk": sugarcane_grower_cooperative_buyer_payment_risk,
     "handicraft-trader-late-payments": handicraft_trader_late_payments,
 }

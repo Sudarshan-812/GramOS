@@ -14,10 +14,19 @@ export interface ClimateProfile {
   alpha_earth_embeddings: number[];
 }
 
+export interface BuyerPaymentProfile {
+  taluk: string;
+  mill_name: string;
+  weighted_exposure_cr: number;
+  stress_flag: "HIGH" | "MEDIUM" | "LOW";
+  confidence: string;
+}
+
 export interface RiskAssessmentRequest {
   enterprise_name: string;
   financials: FinancialProfile;
   climate: ClimateProfile;
+  buyer_payment?: BuyerPaymentProfile | null;
 }
 
 export type RiskClassification = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
@@ -27,6 +36,7 @@ export interface RiskAssessmentResponse {
   risk_classification: RiskClassification;
   financial_health_summary: string;
   climate_risk_impact: string;
+  buyer_payment_risk_impact: string | null;
   actionable_mitigation_steps: string[];
   is_cached_fallback: boolean;
 }

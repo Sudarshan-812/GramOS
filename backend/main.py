@@ -24,6 +24,7 @@ from engine import extract_document_insights, get_golden_fallback, risk_graph
 from models import (
     Alert,
     AuditLog,
+    BuyerPaymentProfile,
     ClimateProfile,
     DocumentInsight,
     FinancialProfile,
@@ -141,6 +142,21 @@ def _synthetic_alpha_earth_embeddings(enterprise_id: str) -> list[float]:
     return [round(rng.uniform(-1.0, 1.0), 4) for _ in range(64)]
 
 
+# There is no buyer_payment_snapshots table yet - Mills/Catchment/Exposure data is still
+# being sourced (RTI + manual fieldwork, see Ref_data/GramOS_Cane_Arrears_Dataset_v1.xlsx).
+# Keyed by enterprise name so it survives reseeding without hardcoding a UUID; swap this
+# dict out for a real Supabase-backed lookup once Exposure data exists.
+_MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME: dict[str, BuyerPaymentProfile] = {
+    "Satti Cane Growers Cooperative (Athani)": BuyerPaymentProfile(
+        taluk="Athani",
+        mill_name="[MOCK - mill unconfirmed, pending village visit] Athani-taluk mill",
+        weighted_exposure_cr=132.0,
+        stress_flag="HIGH",
+        confidence="Low",
+    ),
+}
+
+
 @app.get(
     "/api/mock-profiles/{profile_key}",
     response_model=RiskAssessmentRequest,
@@ -194,6 +210,7 @@ def get_mock_profile(profile_key: str):
             rainfall_deviation_pct=snapshot["rainfall_deviation_pct"],
             alpha_earth_embeddings=_synthetic_alpha_earth_embeddings(profile_key),
         ),
+        buyer_payment=_MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME.get(enterprise["name"]),
     )
 
 

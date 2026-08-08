@@ -26,10 +26,24 @@ class ClimateProfile(BaseModel):
     )
 
 
+class BuyerPaymentProfile(BaseModel):
+    """Mill cane-arrears exposure for the taluk an enterprise operates in. Mirrors the
+    Exposure tab of Ref_data/GramOS_Cane_Arrears_Dataset_v1.xlsx (weighted_exposure_cr,
+    stress_flag). Optional: only rural enterprises in a covered taluk (currently Belagavi,
+    Bagalkote, Vijayapura) will have this signal."""
+
+    taluk: str
+    mill_name: str
+    weighted_exposure_cr: float = Field(..., ge=0, description="Weighted mill arrears exposure, Rs crore")
+    stress_flag: str = Field(..., description="One of: HIGH, MEDIUM, LOW")
+    confidence: str = Field(..., description="Data confidence: High, Medium, Low")
+
+
 class RiskAssessmentRequest(BaseModel):
     enterprise_name: str
     financials: FinancialProfile
     climate: ClimateProfile
+    buyer_payment: BuyerPaymentProfile | None = None
 
 
 class RiskAssessmentResponse(BaseModel):
@@ -37,6 +51,9 @@ class RiskAssessmentResponse(BaseModel):
     risk_classification: str = Field(..., description="One of: LOW, MEDIUM, HIGH, CRITICAL")
     financial_health_summary: str
     climate_risk_impact: str
+    buyer_payment_risk_impact: str | None = Field(
+        default=None, description="Mill/buyer payment risk narrative; null when no buyer_payment data was supplied"
+    )
     actionable_mitigation_steps: list[str]
     is_cached_fallback: bool = Field(
         default=False, description="True when this response was served from the golden fallback cache"
