@@ -142,10 +142,10 @@ export default function TermsPage() {
             <p>
               Questions about these terms can be sent to{" "}
               <a
-                href="mailto:demo@gramos.ai"
+                href="mailto:sudarshankulkarni812@gmail.com"
                 className="font-medium text-lime-700 underline decoration-lime-300 underline-offset-2 hover:text-lime-800"
               >
-                demo@gramos.ai
+                sudarshankulkarni812@gmail.com
               </a>
               .
             </p>

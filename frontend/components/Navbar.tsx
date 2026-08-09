@@ -66,10 +66,10 @@ export default function Navbar() {
             Login
           </Link>
           <a
-            href="#demo"
+            href="/dashboard"
             className="inline-flex cursor-pointer items-center gap-1 rounded-full bg-lime-300 px-4 py-1.5 text-sm font-semibold text-onyx transition hover:bg-lime-200"
           >
-            Request Demo
+            Dashboard
           </a>
         </div>
       </nav>

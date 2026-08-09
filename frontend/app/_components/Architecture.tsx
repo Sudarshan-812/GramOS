@@ -18,10 +18,10 @@ const legacyPoints = [
 ];
 
 const gramosPoints = [
-  "BigQuery-fused transaction logs, updated in real time",
+  "UPI transaction logs & KCC utilization, fused in real time",
   "Alternative data: mobile money, utility, and input purchases",
   "AlphaEarth satellite metrics on rainfall, soil, and vegetation",
-  "Gemini reasoning flags risk 30+ days before default",
+  "Gemini reasoning designed to flag risk before it hits repayment data",
 ];
 
 export default function Architecture() {
@@ -94,7 +94,7 @@ export default function Architecture() {
         {/* Pipeline strip */}
         <Reveal delay={200}>
           <div className="mt-5 flex flex-col items-stretch justify-center gap-1 rounded-2xl border border-black/10 bg-white px-6 py-6 shadow-sm sm:flex-row sm:items-center sm:gap-0">
-            <PipelineStep icon={ClipboardList} label="BigQuery Transaction Logs" />
+            <PipelineStep icon={ClipboardList} label="UPI Transaction Logs" />
             <PipelineArrow />
             <PipelineStep icon={Satellite} label="AlphaEarth Satellite Metrics" />
             <PipelineArrow />

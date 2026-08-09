@@ -27,6 +27,7 @@ import DocumentUploader from "@/components/DocumentUploader";
 import OverrideScoreModal from "@/components/OverrideScoreModal";
 import RiskChart from "@/components/RiskChart";
 import Reveal from "@/components/Reveal";
+import { createClient } from "@/lib/supabase/client";
 import {
   assessRisk,
   getAlerts,
@@ -201,6 +202,17 @@ export default function RiskDashboard() {
 
     async function load() {
       try {
+        // Backend routes require a Supabase JWT. Logged-in visitors already
+        // have one; anonymous visitors (e.g. a cold link with no login UI)
+        // get a real anonymous session so the same JWT-gated API still works.
+        const supabase = createClient();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          await supabase.auth.signInAnonymously();
+        }
+
         const keys = await listMockProfileKeys();
         const loaded = await Promise.all(
           keys.map(async (key) => {

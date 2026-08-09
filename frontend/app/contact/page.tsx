@@ -25,10 +25,10 @@ export default function ContactPage() {
             enquiry — reach us directly and we&rsquo;ll get back to you.
           </p>
           <a
-            href="mailto:demo@gramos.ai"
+            href="mailto:sudarshankulkarni812@gmail.com"
             className="mt-8 inline-flex cursor-pointer items-center gap-2 rounded-full bg-lime-300 px-6 py-3 text-sm font-semibold text-onyx shadow-sm transition hover:-translate-y-0.5 hover:bg-lime-200 hover:shadow-md"
           >
-            demo@gramos.ai
+            sudarshankulkarni812@gmail.com
             <ArrowRight className="h-4 w-4" />
           </a>
         </div>

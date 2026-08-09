@@ -1,8 +1,8 @@
 import { ArrowRight } from "@/components/icons/MaterialIcons";
 
 const stats = [
-  { value: "30+ days", label: "Earlier detection" },
-  { value: "2 sources", label: "BigQuery + AlphaEarth" },
+  { value: "Early Warning", label: "Built to flag risk before default" },
+  { value: "2 sources", label: "Transaction Logs + AlphaEarth" },
   { value: "100%", label: "Explainable by Gemini" },
 ];
 
@@ -87,10 +87,10 @@ export default function Hero() {
           style={{ animationDelay: "0.24s" }}
         >
           <a
-            href="#demo"
+            href="/dashboard"
             className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-lime-300 px-6 py-3 text-sm font-semibold text-onyx shadow-sm transition hover:-translate-y-0.5 hover:bg-lime-200 hover:shadow-md"
           >
-            Request Demo
+            Dashboard
             <ArrowRight className="h-4 w-4" />
           </a>
           <a
