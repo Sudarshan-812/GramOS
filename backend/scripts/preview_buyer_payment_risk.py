@@ -1,8 +1,11 @@
-"""One-off preview: run the risk engine with a MOCK buyer_payment_risk signal and REAL
-wris_climate data so both can be eyeballed together. buyer_payment is still a placeholder
-(real Mills/Catchment/Exposure data isn't sourced yet); wris_climate is real India-WRIS
-data for Belagavi, June 2025 (see backend/scripts/fetch_wris_climate_data.py). Not
-imported by the live app. Run from backend/: python scripts/preview_buyer_payment_risk.py
+"""One-off preview: run the risk engine with a REAL buyer_payment_risk signal and REAL
+wris_climate data so both can be eyeballed together. buyer_payment below is the Athani-taluk
+rollup (Ugar Sugars Ltd + 3 other Athani-taluk mills) from the Karnataka RTI response
+received 2026-08-23 (registration SECCI/R/2026/60049; see
+backend/scripts/parse_rti_cane_arrears.py and Ref_data/rti_cane_arrears_processed.json).
+wris_climate is real India-WRIS data for Belagavi, June 2025 (see
+backend/scripts/fetch_wris_climate_data.py). Not imported by the live app.
+Run from backend/: python scripts/preview_buyer_payment_risk.py
 
 Each run costs 5 Gemini calls (climate, financial, buyer-payment, wris-climate, synthesis)
 against the free-tier's 20/day quota - don't run this repeatedly while testing something
@@ -47,14 +50,12 @@ MOCK_REQUEST = RiskAssessmentRequest(
     buyer_payment=BuyerPaymentProfile(
         taluk="Athani",
         mill_name=(
-            "Shri Brahmanand Sagar Jaggery Industries (Alagawadi, Raibag taluk - corrected "
-            "2026-08-08, supersedes the earlier wrong 'Krishna SSK Ltd' identification) - a "
-            "jaggery/gur unit, NOT a Cane-Commissionerate-regulated sugar mill. "
-            "[MOCK dues/arrears figures - real numbers not sourced]"
+            "UGAR SUGARS LTD., UGARKHURD, ATHANI TALUK. BELAGAVI DISTRICT [+3 other mill(s) "
+            "in taluk] [REAL DATA: Karnataka RTI response, registration SECCI/R/2026/60049]"
         ),
-        weighted_exposure_cr=132.0,
+        weighted_exposure_cr=19.83,
         stress_flag="HIGH",
-        confidence="Low",
+        confidence="High",
     ),
     wris_climate=WrisClimateSnapshot(
         district="Belagavi",
