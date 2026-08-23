@@ -19,6 +19,7 @@ from fastapi.security import OAuth2PasswordBearer
 from google.genai import errors as genai_errors
 from langchain_google_genai.chat_models import ChatGoogleGenerativeAIError
 
+import rti_data
 from database import get_supabase_client
 from engine import extract_document_insights, get_golden_fallback, risk_graph
 from models import (
@@ -148,96 +149,34 @@ def _synthetic_alpha_earth_embeddings(enterprise_id: str) -> list[float]:
     return [round(rng.uniform(-1.0, 1.0), 4) for _ in range(64)]
 
 
-# There is no buyer_payment_snapshots table yet, so buyer_payment is resolved from two
-# sources, in priority order:
-#
-# 1. _MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME - explicit per-enterprise overrides for
-#    buyers the sugar-mill RTI cannot cover at all (e.g. jaggery/gur units, which operate
-#    outside the Cane Commissionerate's regulatory/reporting framework). Still
-#    field-reported estimates, Low confidence.
-# 2. _RTI_EXPOSURE_BY_TALUK - real, High-confidence mill arrears data parsed from the
-#    Karnataka RTI response (registration SECCI/R/2026/60049; see
-#    backend/scripts/parse_rti_cane_arrears.py), keyed by taluk via
-#    _ENTERPRISE_TO_RTI_TALUK below.
-#
-# Both are keyed by enterprise name so they survive reseeding without hardcoding a UUID;
+# There is no buyer_payment_snapshots table yet, so buyer_payment is resolved from real,
+# High-confidence mill arrears data parsed from the Karnataka RTI response (registration
+# SECCI/R/2026/60049; see backend/scripts/parse_rti_cane_arrears.py and rti_data.py), keyed
+# by enterprise name via the shared taluk_enterprise_name() convention in rti_data.py (also
+# used by backend/scripts/seed_profiles.py, so the two can't drift). Every demo enterprise
+# is a "<Taluk> Cane Growers Cooperative" selling into that taluk's real mill catchment;
 # swap out for a real Supabase-backed lookup once Mills/Catchment/Exposure tables exist.
-_MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME: dict[str, BuyerPaymentProfile] = {
-    "Satti Cane Growers Cooperative (Athani)": BuyerPaymentProfile(
-        taluk="Athani",
-        mill_name=(
-            "Shri Brahmanand Sagar Jaggery Industries (Alagawadi, Raibag taluk - corrected "
-            "2026-08-08, supersedes the earlier wrong 'Krishna SSK Ltd' identification, which "
-            "was based on stale 2023 info) - a jaggery/gur unit, NOT a Cane-Commissionerate-"
-            "regulated sugar mill, so it is confirmed outside the sugar-mill RTI's scope (the "
-            "response received 2026-08-23 covers only Belagavi/Bagalkote/Vijayapura sugar "
-            "factories - see Ref_data/rti_cane_arrears.csv). [MOCK dues/arrears figures - real "
-            "numbers not sourced; jaggery units need a separate sourcing route]"
-        ),
-        weighted_exposure_cr=132.0,
-        stress_flag="HIGH",
-        confidence="Low",
-    ),
-}
-
-_RTI_EXPOSURE_PATH = os.path.join(
-    os.path.dirname(__file__), "..", "Ref_data", "rti_cane_arrears_processed.json"
-)
-
-# Demo enterprises that sell into an RTI-covered taluk (as opposed to
-# _MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME above, whose buyers the RTI can't cover at all).
+_RTI_EXPOSURE_BY_TALUK = rti_data.load_exposure_by_taluk()
+_DISTRICT_BY_TALUK = rti_data.load_district_by_taluk()
 _ENTERPRISE_TO_RTI_TALUK: dict[str, str] = {
-    "Ugar Cane Growers Cooperative (Athani)": "Athani",
+    rti_data.taluk_enterprise_name(taluk): taluk for taluk in _RTI_EXPOSURE_BY_TALUK
 }
-
-
-def _load_rti_exposure_by_taluk() -> dict[str, BuyerPaymentProfile]:
-    try:
-        with open(_RTI_EXPOSURE_PATH, encoding="utf-8") as f:
-            raw = json.load(f)
-    except FileNotFoundError:
-        logger.warning(
-            "rti_cane_arrears_processed.json not found at %s; run "
-            "backend/scripts/parse_rti_cane_arrears.py first",
-            _RTI_EXPOSURE_PATH,
-        )
-        return {}
-
-    confidence = raw["metadata"]["confidence"]
-    return {
-        taluk: BuyerPaymentProfile(
-            taluk=taluk,
-            mill_name=(
-                f"{data['dominant_mill_name']} [+{data['mill_count'] - 1} other mill(s) in "
-                f"taluk]" if data["mill_count"] > 1 else data["dominant_mill_name"]
-            )
-            + " [REAL DATA: Karnataka RTI response, registration "
-            + raw["metadata"]["rti_registration_number"] + "]",
-            weighted_exposure_cr=data["weighted_exposure_cr"],
-            stress_flag=data["stress_flag"],
-            confidence=confidence,
-        )
-        for taluk, data in raw["exposure_by_taluk"].items()
-    }
-
-
-_RTI_EXPOSURE_BY_TALUK = _load_rti_exposure_by_taluk()
 
 
 def _get_buyer_payment_profile(enterprise_name: str) -> BuyerPaymentProfile | None:
-    if enterprise_name in _MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME:
-        return _MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME[enterprise_name]
     taluk = _ENTERPRISE_TO_RTI_TALUK.get(enterprise_name)
     return _RTI_EXPOSURE_BY_TALUK.get(taluk) if taluk else None
 
+
 # Real (not mock) India-WRIS ground-observation data - see backend/wris_client.py and
 # backend/scripts/fetch_wris_climate_data.py, which produced this file. There is no
-# database table for it yet either, so this loads the same JSON snapshot the script
-# saved rather than duplicating the numbers inline. Enterprise -> district mapping is
-# hardcoded here the same way buyer_payment's enterprise -> taluk mapping is.
+# database table for it yet either, so this loads the same JSON snapshot the script saved
+# rather than duplicating the numbers inline. Enterprise -> district is derived from the
+# same taluk->district mapping the RTI data carries (WRIS coverage is district-level, one
+# level coarser than the taluk-level buyer_payment signal).
 _WRIS_DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "Ref_data", "wris_climate_data.json")
 _ENTERPRISE_TO_WRIS_DISTRICT: dict[str, str] = {
-    "Satti Cane Growers Cooperative (Athani)": "Belagavi",
+    rti_data.taluk_enterprise_name(taluk): district for taluk, district in _DISTRICT_BY_TALUK.items()
 }
 
 

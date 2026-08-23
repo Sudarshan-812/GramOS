@@ -1,4 +1,4 @@
-"""Backfills 30 days of synthetic time-series activity for the 3 enterprises seeded by
+"""Backfills 30 days of synthetic time-series activity for the enterprises seeded by
 init_supabase.py: one ClimateSnapshot row and one aggregated daily FinancialLedger row per
 enterprise per day.
 
@@ -80,16 +80,6 @@ def _clamp(value: float, lo: float | None, hi: float | None) -> float:
     return value
 
 
-def declining_trend(start: float, end: float, days: int, noise_std: float, lo=None, hi=None) -> list[float]:
-    """Steady linear decline from start -> end with realistic day-to-day noise layered on top."""
-    values = []
-    for day in range(days):
-        t = day / (days - 1)
-        base = start + (end - start) * t
-        values.append(_clamp(base + random.gauss(0, noise_std), lo, hi))
-    return values
-
-
 def mean_reverting_walk(anchor: float, days: int, noise_std: float, theta: float = 0.3, lo=None, hi=None) -> list[float]:
     """Random walk that fluctuates around a fixed anchor value (no forced trend)."""
     values = [_clamp(anchor + random.gauss(0, noise_std), lo, hi)]
@@ -100,17 +90,11 @@ def mean_reverting_walk(anchor: float, days: int, noise_std: float, theta: float
     return values
 
 
-def generate_climate_series(is_dairy: bool, anchor) -> list[dict]:
+def generate_climate_series(anchor) -> list[dict]:
     """anchor is a ClimateProfile: today's already-known values from mock_data."""
-    if is_dairy:
-        # Force a steady drought trend: healthier 30 days ago, declining to today's known bad state.
-        ndvi = declining_trend(0.60, anchor.ndvi_index, BACKFILL_DAYS, noise_std=0.015, lo=0.0, hi=1.0)
-        soil = declining_trend(42.0, anchor.soil_moisture_percentage, BACKFILL_DAYS, noise_std=1.2, lo=0.0, hi=100.0)
-        rain = declining_trend(8.0, anchor.rainfall_deviation_pct, BACKFILL_DAYS, noise_std=1.5, lo=-60.0, hi=60.0)
-    else:
-        ndvi = mean_reverting_walk(anchor.ndvi_index, BACKFILL_DAYS, noise_std=0.02, lo=0.0, hi=1.0)
-        soil = mean_reverting_walk(anchor.soil_moisture_percentage, BACKFILL_DAYS, noise_std=1.5, lo=0.0, hi=100.0)
-        rain = mean_reverting_walk(anchor.rainfall_deviation_pct, BACKFILL_DAYS, noise_std=2.0, lo=-60.0, hi=60.0)
+    ndvi = mean_reverting_walk(anchor.ndvi_index, BACKFILL_DAYS, noise_std=0.02, lo=0.0, hi=1.0)
+    soil = mean_reverting_walk(anchor.soil_moisture_percentage, BACKFILL_DAYS, noise_std=1.5, lo=0.0, hi=100.0)
+    rain = mean_reverting_walk(anchor.rainfall_deviation_pct, BACKFILL_DAYS, noise_std=2.0, lo=-60.0, hi=60.0)
 
     return [
         {"ndvi_index": round(ndvi[i], 4), "soil_moisture_percentage": round(soil[i], 2), "rainfall_deviation_pct": round(rain[i], 2)}
@@ -118,34 +102,19 @@ def generate_climate_series(is_dairy: bool, anchor) -> list[dict]:
     ]
 
 
-# (txn_count_range, ticket_size_range): daily UPI transaction volume and average ticket size
-# vary by business type, roughly centered on each enterprise's known mock_data figures.
-FINANCIAL_PROFILES_BY_TYPE = {
-    "dairy cooperative": {"txn_count": (370, 450), "ticket_size": (400.0, 500.0)},
-    "agri input retailer": {"txn_count": (850, 1100), "ticket_size": (950.0, 1300.0)},
-    "handicraft & textile trader": {"txn_count": (120, 190), "ticket_size": (500.0, 700.0)},
-}
 DEFAULT_FINANCIAL_PROFILE = {"txn_count": (150, 400), "ticket_size": (500.0, 900.0)}
 
 
-def generate_financial_series(business_type: str, is_dairy: bool, is_handloom: bool, anchor) -> list[dict]:
+def generate_financial_series(anchor) -> list[dict]:
     """anchor is a FinancialProfile: today's already-known values from mock_data."""
-    cfg = FINANCIAL_PROFILES_BY_TYPE.get(business_type.lower(), DEFAULT_FINANCIAL_PROFILE)
+    cfg = DEFAULT_FINANCIAL_PROFILE
 
     txn_counts = [random.randint(*cfg["txn_count"]) for _ in range(BACKFILL_DAYS)]
     ticket_sizes = mean_reverting_walk(anchor.avg_ticket_size_inr, BACKFILL_DAYS, noise_std=15.0, theta=0.4, lo=1.0)
 
     kcc = mean_reverting_walk(anchor.kcc_utilization_pct, BACKFILL_DAYS, noise_std=2.0, lo=0.0, hi=100.0)
-    dpd = [0] * BACKFILL_DAYS
-
-    if is_handloom:
-        # Already-flagged critical enterprise: repayment discipline worsens steadily over the month.
-        dpd_trend = declining_trend(5.0, float(anchor.days_past_due), BACKFILL_DAYS, noise_std=1.0, lo=0.0)
-        dpd = [max(0, round(v)) for v in dpd_trend]
-        kcc = declining_trend(55.0, anchor.kcc_utilization_pct, BACKFILL_DAYS, noise_std=2.0, lo=0.0, hi=100.0)
-    elif not is_dairy:
-        # Mild, non-trending jitter around the known current DPD (dairy stays at a clean 0 throughout).
-        dpd = [max(0, round(anchor.days_past_due + random.gauss(0, 1.0))) for _ in range(BACKFILL_DAYS)]
+    # Mild, non-trending jitter around the known current DPD.
+    dpd = [max(0, round(anchor.days_past_due + random.gauss(0, 1.0))) for _ in range(BACKFILL_DAYS)]
 
     rows = []
     for i in range(BACKFILL_DAYS):
@@ -185,13 +154,8 @@ def backfill() -> None:
             print(f"Skipping '{ent['name']}': no matching mock_data profile to anchor against.")
             continue
 
-        is_dairy = "dairy" in ent["business_type"].lower()
-        is_handloom = "handloom" in ent["name"].lower() or "textile" in ent["business_type"].lower()
-
-        climate_series = generate_climate_series(is_dairy, profile.climate)
-        financial_series = generate_financial_series(
-            ent["business_type"], is_dairy, is_handloom, profile.financials
-        )
+        climate_series = generate_climate_series(profile.climate)
+        financial_series = generate_financial_series(profile.financials)
 
         for day, climate_day, financial_day in zip(dates, climate_series, financial_series):
             recorded_at = day.isoformat()
