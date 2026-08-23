@@ -27,10 +27,15 @@ class ClimateProfile(BaseModel):
 
 
 class BuyerPaymentProfile(BaseModel):
-    """Mill cane-arrears exposure for the taluk an enterprise operates in. Mirrors the
-    Exposure tab of Ref_data/GramOS_Cane_Arrears_Dataset_v1.xlsx (weighted_exposure_cr,
-    stress_flag). Optional: only rural enterprises in a covered taluk (currently Belagavi,
-    Bagalkote, Vijayapura) will have this signal."""
+    """Mill cane-arrears exposure for the taluk an enterprise operates in. For taluks
+    covered by the Karnataka RTI response on 2025-26 season cane payment arrears
+    (registration SECCI/R/2026/60049; see backend/scripts/parse_rti_cane_arrears.py and
+    Ref_data/rti_cane_arrears_processed.json), weighted_exposure_cr/stress_flag are real,
+    High-confidence figures - not the Exposure-tab placeholders this used to describe.
+    Enterprises outside RTI-covered taluks (e.g. jaggery/gur buyers, which the sugar-mill
+    RTI does not cover) still use Low-confidence field-reported estimates. Optional: only
+    rural enterprises in a covered taluk (currently Belagavi, Bagalkote, Vijayapura) will
+    have this signal."""
 
     taluk: str
     mill_name: str

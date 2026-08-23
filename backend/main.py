@@ -105,16 +105,16 @@ scheduler = AsyncIOScheduler()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    scheduler.add_job(
-        check_climate_thresholds,
-        "interval",
-        minutes=1,
-        id="check_climate_thresholds",
-    )
-    scheduler.start()
-    logger.info("Scheduler started: check_climate_thresholds every 1 minute")
+    # scheduler.add_job(
+    #     check_climate_thresholds,
+    #     "interval",
+    #     minutes=1,
+    #     id="check_climate_thresholds",
+    # )
+    # scheduler.start()
+    # logger.info("Scheduler started: check_climate_thresholds every 1 minute")
     yield
-    scheduler.shutdown()
+    # scheduler.shutdown()
 
 
 app = FastAPI(title="GramOS API", version="0.1.0", lifespan=lifespan)
@@ -148,10 +148,20 @@ def _synthetic_alpha_earth_embeddings(enterprise_id: str) -> list[float]:
     return [round(rng.uniform(-1.0, 1.0), 4) for _ in range(64)]
 
 
-# There is no buyer_payment_snapshots table yet - Mills/Catchment/Exposure data is still
-# being sourced (RTI + manual fieldwork, see Ref_data/GramOS_Cane_Arrears_Dataset_v1.xlsx).
-# Keyed by enterprise name so it survives reseeding without hardcoding a UUID; swap this
-# dict out for a real Supabase-backed lookup once Exposure data exists.
+# There is no buyer_payment_snapshots table yet, so buyer_payment is resolved from two
+# sources, in priority order:
+#
+# 1. _MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME - explicit per-enterprise overrides for
+#    buyers the sugar-mill RTI cannot cover at all (e.g. jaggery/gur units, which operate
+#    outside the Cane Commissionerate's regulatory/reporting framework). Still
+#    field-reported estimates, Low confidence.
+# 2. _RTI_EXPOSURE_BY_TALUK - real, High-confidence mill arrears data parsed from the
+#    Karnataka RTI response (registration SECCI/R/2026/60049; see
+#    backend/scripts/parse_rti_cane_arrears.py), keyed by taluk via
+#    _ENTERPRISE_TO_RTI_TALUK below.
+#
+# Both are keyed by enterprise name so they survive reseeding without hardcoding a UUID;
+# swap out for a real Supabase-backed lookup once Mills/Catchment/Exposure tables exist.
 _MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME: dict[str, BuyerPaymentProfile] = {
     "Satti Cane Growers Cooperative (Athani)": BuyerPaymentProfile(
         taluk="Athani",
@@ -159,15 +169,66 @@ _MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME: dict[str, BuyerPaymentProfile] = {
             "Shri Brahmanand Sagar Jaggery Industries (Alagawadi, Raibag taluk - corrected "
             "2026-08-08, supersedes the earlier wrong 'Krishna SSK Ltd' identification, which "
             "was based on stale 2023 info) - a jaggery/gur unit, NOT a Cane-Commissionerate-"
-            "regulated sugar mill, so it is likely outside the sugar-mill RTI's scope. "
-            "[MOCK dues/arrears figures - real numbers not sourced, and the usual sugar-mill "
-            "RTI/S02 sourcing path probably does not apply to this buyer]"
+            "regulated sugar mill, so it is confirmed outside the sugar-mill RTI's scope (the "
+            "response received 2026-08-23 covers only Belagavi/Bagalkote/Vijayapura sugar "
+            "factories - see Ref_data/rti_cane_arrears.csv). [MOCK dues/arrears figures - real "
+            "numbers not sourced; jaggery units need a separate sourcing route]"
         ),
         weighted_exposure_cr=132.0,
         stress_flag="HIGH",
         confidence="Low",
     ),
 }
+
+_RTI_EXPOSURE_PATH = os.path.join(
+    os.path.dirname(__file__), "..", "Ref_data", "rti_cane_arrears_processed.json"
+)
+
+# Demo enterprises that sell into an RTI-covered taluk (as opposed to
+# _MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME above, whose buyers the RTI can't cover at all).
+_ENTERPRISE_TO_RTI_TALUK: dict[str, str] = {
+    "Ugar Cane Growers Cooperative (Athani)": "Athani",
+}
+
+
+def _load_rti_exposure_by_taluk() -> dict[str, BuyerPaymentProfile]:
+    try:
+        with open(_RTI_EXPOSURE_PATH, encoding="utf-8") as f:
+            raw = json.load(f)
+    except FileNotFoundError:
+        logger.warning(
+            "rti_cane_arrears_processed.json not found at %s; run "
+            "backend/scripts/parse_rti_cane_arrears.py first",
+            _RTI_EXPOSURE_PATH,
+        )
+        return {}
+
+    confidence = raw["metadata"]["confidence"]
+    return {
+        taluk: BuyerPaymentProfile(
+            taluk=taluk,
+            mill_name=(
+                f"{data['dominant_mill_name']} [+{data['mill_count'] - 1} other mill(s) in "
+                f"taluk]" if data["mill_count"] > 1 else data["dominant_mill_name"]
+            )
+            + " [REAL DATA: Karnataka RTI response, registration "
+            + raw["metadata"]["rti_registration_number"] + "]",
+            weighted_exposure_cr=data["weighted_exposure_cr"],
+            stress_flag=data["stress_flag"],
+            confidence=confidence,
+        )
+        for taluk, data in raw["exposure_by_taluk"].items()
+    }
+
+
+_RTI_EXPOSURE_BY_TALUK = _load_rti_exposure_by_taluk()
+
+
+def _get_buyer_payment_profile(enterprise_name: str) -> BuyerPaymentProfile | None:
+    if enterprise_name in _MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME:
+        return _MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME[enterprise_name]
+    taluk = _ENTERPRISE_TO_RTI_TALUK.get(enterprise_name)
+    return _RTI_EXPOSURE_BY_TALUK.get(taluk) if taluk else None
 
 # Real (not mock) India-WRIS ground-observation data - see backend/wris_client.py and
 # backend/scripts/fetch_wris_climate_data.py, which produced this file. There is no
@@ -262,7 +323,7 @@ def get_mock_profile(profile_key: str):
             rainfall_deviation_pct=snapshot["rainfall_deviation_pct"],
             alpha_earth_embeddings=_synthetic_alpha_earth_embeddings(profile_key),
         ),
-        buyer_payment=_MOCK_BUYER_PAYMENT_BY_ENTERPRISE_NAME.get(enterprise["name"]),
+        buyer_payment=_get_buyer_payment_profile(enterprise["name"]),
         wris_climate=_WRIS_SNAPSHOTS_BY_DISTRICT.get(
             _ENTERPRISE_TO_WRIS_DISTRICT.get(enterprise["name"], "")
         ),

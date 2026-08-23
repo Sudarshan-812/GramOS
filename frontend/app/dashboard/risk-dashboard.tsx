@@ -535,9 +535,9 @@ export default function RiskDashboard() {
               </div>
               {selected.profile.buyer_payment && (
                 <p className="mt-3 text-xs text-onyx/40">
-                  Buyer payment exposure figures are mock placeholders (
-                  {selected.profile.buyer_payment.mill_name}) pending real
-                  Mills/Catchment/Exposure data.
+                  {selected.profile.buyer_payment.confidence === "High"
+                    ? `Buyer payment exposure is sourced from a Karnataka RTI response (${selected.profile.buyer_payment.mill_name}).`
+                    : `Buyer payment exposure figures are field-reported estimates, not yet independently verified (${selected.profile.buyer_payment.mill_name}).`}
                 </p>
               )}
               {selected.profile.wris_climate && (
