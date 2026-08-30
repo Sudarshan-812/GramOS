@@ -2,6 +2,7 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import Architecture from "./_components/Architecture";
 import Chakra from "./_components/Chakra";
+
 import CTA from "./_components/CTA";
 import Features from "./_components/Features";
 import Flora from "./_components/Flora";

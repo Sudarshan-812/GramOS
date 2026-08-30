@@ -52,12 +52,15 @@ ALLOWED_DOCUMENT_MIME_TYPES = {
 
 logger = logging.getLogger("gramos")
 
-# Was 4.5s, tuned when the graph had 3 Gemini calls (2 parallel + synthesis). Now 5
-# calls (4 parallel analysis nodes + a synthesis prompt that includes all 4 of their
-# outputs, so it's slower too) - 4.5s was confirmed too tight over a real network
-# connection on 2026-08-08 (timed out even on gemini-3.1-flash-lite), silently
-# degrading every assessment to the generic golden fallback.
-ASSESS_RISK_TIMEOUT_SECONDS = 15.0
+# Was 4.5s, then 15s. The graph now fires 5 Gemini calls (4 parallel analysis nodes +
+# synthesis). Each call on its own is ~2-3s, but firing 4 at once against the
+# gemini-3.1-flash-lite free tier (15 RPM) triggers throttling, so the slowest analysis
+# node tails out to 10-12s and end-to-end wall time is a consistent ~17-18s (measured
+# 2026-08-30). At 15s every real assessment silently timed out and served the generic
+# golden fallback ("Live risk analysis is temporarily unavailable"); 40s clears the
+# observed tail with headroom. A paid Gemini key removes the throttling and lets this
+# come back down.
+ASSESS_RISK_TIMEOUT_SECONDS = 40.0
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 
