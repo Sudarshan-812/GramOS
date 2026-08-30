@@ -22,6 +22,7 @@ GramOS fuses structured transaction data with real-time earth observation, reaso
 ## What's built
 
 - **Explainable multi-agent risk engine**: a LangGraph pipeline runs a financial-health agent and a climate-risk agent in parallel over Gemini, combines their output with a separate deterministic scoring model (auditable, not LLM-generated; RBI Model Risk Management-aligned), and synthesizes a final narrative: risk score, classification, financial summary, climate impact, and concrete mitigation steps.
+- **Real buyer-payment risk signal**: rather than a synthetic proxy, `buyer_payment_risk` is sourced from a real Karnataka RTI response on sugar mill cane-crushing/payment arrears — mills routinely delay statutory 14-day payments to growers, and when they do it hits every grower village in that mill's catchment simultaneously. This is a shock invisible to both financial ledgers and satellite crop-health monitoring, since the crop itself is fine; the buyer just hasn't paid.
 - **Document intelligence**: loan officers upload bank statements, KCC passbooks, or invoices (PDF/image); Gemini's multimodal API extracts underwriting-relevant figures directly from the document into structured JSON, no OCR pipeline required.
 - **Human-in-the-loop override with audit trail**: any AI-generated score can be manually overridden by a loan officer with a mandatory justification. The override, the original score, and the officer's identity (from their verified session) are written to an immutable audit log.
 - **Proactive risk alerting**: a background scheduler polls every enterprise's latest climate snapshot on an interval and raises a warning the moment NDVI or soil moisture crosses a drought threshold, rather than waiting for someone to check.
@@ -30,7 +31,9 @@ GramOS fuses structured transaction data with real-time earth observation, reaso
 
 ## Current status
 
-This is a working prototype, not a production deployment. Three mock enterprises are seeded with real backend logic running end-to-end; AlphaEarth satellite ingestion is stubbed with deterministic synthetic values pending live integration, and financial history is backfilled synthetic data anchored to each enterprise's profile. Everything else (auth, the risk engine, document extraction, the audit trail, and alerting) runs against a real Supabase instance and real Gemini calls.
+This is a working prototype, not a production deployment. 21 enterprises are seeded — one per taluk covered by a Karnataka RTI response on 2025-26 season cane crushing/payment arrears (registration `SECCI/R/2026/60049`, received 2026-08-23) — with real backend logic running end-to-end. For every one of these, `buyer_payment_risk` (mill name, weighted arrears exposure, stress flag) is **real, High-confidence data**, not a placeholder: see `backend/rti_data.py` and `backend/scripts/parse_rti_cane_arrears.py`. Financials and climate profiles are still synthetic (seeded deterministically per taluk, scaled to that taluk's real stress level) pending real per-enterprise ledger and live AlphaEarth integration. Auth, the risk engine, document extraction, the audit trail, and alerting all run against a real Supabase instance and real Gemini calls.
+
+**Known limitation, stated plainly**: the RTI data is a single season-end snapshot (99.4% of arrears were already paid by the time it arrived), so it can demonstrate real buyer-arrears exposure per taluk but cannot yet validate the core predictive hypothesis — that buyer payment delays show up in borrower repayment stress 60-120 days later. That needs backtesting against real, anonymized loan-repayment data from a lending partner, which has not happened yet.
 
 ---
 
@@ -115,7 +118,9 @@ venv\Scripts\activate          # Windows
 
 pip install -r requirements.txt
 
-# Create schema + seed the 3 mock enterprises (idempotent, safe to re-run)
+# Parse the RTI cane-arrears dataset into per-taluk exposure data (see Ref_data/)
+python scripts/parse_rti_cane_arrears.py
+# Create schema + seed the 21 RTI-backed taluk cooperative enterprises (idempotent, safe to re-run)
 python scripts/init_supabase.py
 # Backfill 30 days of synthetic time-series activity for those enterprises
 python scripts/seed_dynamic_data.py

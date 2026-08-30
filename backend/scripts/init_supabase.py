@@ -1,8 +1,9 @@
 """One-off Supabase Postgres bootstrap for GramOS.
 
 Creates the enterprises / financial_ledgers / climate_snapshots tables via a direct
-Postgres connection (SUPABASE_DB_URL), then seeds the 3 core mock enterprises via the
-Supabase REST client (SUPABASE_URL / SUPABASE_SERVICE_KEY).
+Postgres connection (SUPABASE_DB_URL), then seeds the RTI-backed taluk cooperative
+enterprises (see backend/scripts/seed_profiles.py) via the Supabase REST client
+(SUPABASE_URL / SUPABASE_SERVICE_KEY).
 
 The Supabase REST client (postgrest-based) cannot execute DDL such as CREATE TABLE,
 so schema creation and data seeding deliberately use two different connections.
@@ -153,7 +154,7 @@ def seed_mock_enterprises() -> None:
 
         print(f"Seeded enterprise: {profile.enterprise_name}")
 
-    print("Seed complete: dairy co-op, agri-retailer, and handloom trader are in Supabase.")
+    print(f"Seed complete: {len(MOCK_PROFILES)} RTI-backed taluk cooperatives are in Supabase.")
 
 
 def main() -> None:
