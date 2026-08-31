@@ -18,7 +18,7 @@ export default function CTA() {
           </p>
           <a
             href="/dashboard"
-            className="mt-8 inline-flex cursor-pointer items-center gap-2 rounded-full bg-lime-300 px-6 py-3 text-sm font-semibold text-onyx shadow-sm transition hover:-translate-y-0.5 hover:bg-lime-200 hover:shadow-md"
+            className="mt-8 inline-flex cursor-pointer items-center gap-2 rounded-md bg-lime-300 px-6 py-3 text-sm font-semibold text-onyx shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-lime-200 hover:shadow-md active:translate-y-0 active:shadow-sm"
           >
             Dashboard
             <ArrowRight className="h-4 w-4" />
