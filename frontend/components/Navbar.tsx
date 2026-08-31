@@ -41,7 +41,7 @@ export default function Navbar() {
             className="h-6 w-6"
             priority
           />
-          <span className="text-sm font-semibold tracking-tight text-onyx">
+          <span className="font-mono text-sm font-semibold tracking-tight text-onyx">
             GramOS
           </span>
         </a>

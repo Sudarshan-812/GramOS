@@ -305,7 +305,7 @@ export default function RiskDashboard() {
               height={442}
               className="h-6 w-6"
             />
-            <h1 className="text-xl font-semibold tracking-tight text-onyx">
+            <h1 className="font-mono text-xl font-semibold tracking-tight text-onyx">
               GramOS
             </h1>
           </div>

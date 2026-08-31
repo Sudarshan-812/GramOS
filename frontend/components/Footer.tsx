@@ -20,7 +20,7 @@ export default function Footer() {
               height={442}
               className="h-5 w-5"
             />
-            <span className="font-semibold text-onyx/80">GramOS</span>
+            <span className="font-mono font-semibold text-onyx/80">GramOS</span>
           </a>
           <nav className="flex items-center gap-6 text-sm text-onyx/50">
             {FOOTER_LINKS.map(({ href, label }) => (
