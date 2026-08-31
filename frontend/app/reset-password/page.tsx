@@ -42,10 +42,10 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-sm rounded-2xl border border-black/10 bg-white p-8 shadow-sm">
         <div className="flex items-center gap-2">
           <Image
-            src="/gramos-logo.png"
+            src="/gramos-mark.png"
             alt="GramOS"
-            width={1024}
-            height={1024}
+            width={442}
+            height={442}
             className="h-8 w-8"
             priority
           />

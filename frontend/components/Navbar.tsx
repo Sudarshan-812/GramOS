@@ -34,10 +34,10 @@ export default function Navbar() {
       >
         <a href="#top" className="flex cursor-pointer items-center gap-2">
           <Image
-            src="/gramos-logo.png"
+            src="/gramos-mark.png"
             alt="GramOS"
-            width={1024}
-            height={1024}
+            width={442}
+            height={442}
             className="h-6 w-6"
             priority
           />
