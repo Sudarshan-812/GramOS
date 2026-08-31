@@ -264,102 +264,36 @@ function SubmitButton({
   );
 }
 
-/** Left half on desktop: dark agri-fintech brand panel with an ambient
- * rupee "chakra", plowed-field furrows, and a few twinkling seed points. */
+/** Left half on desktop: dark brand panel with a flat agriculture-finance
+ * illustration — a sprout growing beside a stack of coins, on a forecast arc. */
 function BrandPanel() {
   return (
     <aside className="relative hidden overflow-hidden bg-onyx px-14 py-12 text-white lg:flex lg:flex-col lg:justify-between">
+      {/* faint tiled seed / plus pattern */}
+      <svg aria-hidden className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.04]">
+        <defs>
+          <pattern id="agri-tile" width="52" height="52" patternUnits="userSpaceOnUse">
+            <path d="M13 8v10 M8 13h10" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+            <circle cx="39" cy="37" r="1.6" fill="white" />
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#agri-tile)" />
+      </svg>
+
       {/* ambient lime glow */}
       <div
         aria-hidden
-        className="animate-aurora pointer-events-none absolute -left-24 -top-24 h-96 w-96 rounded-full bg-lime-500/20 blur-3xl"
+        className="animate-aurora pointer-events-none absolute -left-24 -top-28 h-96 w-96 rounded-full bg-lime-500/20 blur-3xl"
       />
 
-      {/* rotating rupee chakra, anchored off the bottom-right corner */}
-      <svg
-        aria-hidden
-        viewBox="0 0 400 400"
-        className="animate-spin-slower pointer-events-none absolute -bottom-40 -right-40 h-[34rem] w-[34rem] opacity-70"
-      >
-        <circle cx="200" cy="200" r="192" fill="none" stroke="#a3e635" strokeOpacity="0.18" />
-        {Array.from({ length: 12 }, (_, i) => (
-          <path
-            key={i}
-            d="M200,145 C182,110 182,60 200,32 C218,60 218,110 200,145 Z"
-            fill="#84cc16"
-            fillOpacity={i % 2 === 0 ? "0.16" : "0.07"}
-            stroke="#bef264"
-            strokeOpacity="0.22"
-            transform={`rotate(${(i / 12) * 360} 200 200)`}
-          />
-        ))}
-        <circle cx="200" cy="200" r="34" fill="none" stroke="#bef264" strokeOpacity="0.5" />
-        <text
-          x="200"
-          y="212"
-          textAnchor="middle"
-          fontSize="30"
-          fontWeight="600"
-          fill="#bef264"
-          fillOpacity="0.75"
-        >
-          ₹
-        </text>
-      </svg>
-
-      {/* plowed-field furrows */}
-      <svg
-        aria-hidden
-        viewBox="0 0 600 260"
-        preserveAspectRatio="none"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-56 w-full"
-      >
-        {Array.from({ length: 6 }, (_, i) => {
-          const y = 60 + i * 34;
-          return (
-            <path
-              key={i}
-              d={`M0,${y} C160,${y - 22} 440,${y + 22} 600,${y}`}
-              fill="none"
-              stroke="#a3e635"
-              strokeOpacity={0.05 + i * 0.03}
-              strokeWidth="1.5"
-            />
-          );
-        })}
-      </svg>
-
-      {/* twinkling seed points */}
-      {[
-        ["18%", "22%", "0s"],
-        ["34%", "68%", "0.6s"],
-        ["72%", "30%", "1.1s"],
-        ["58%", "80%", "1.7s"],
-      ].map(([top, left, delay], i) => (
-        <span
-          key={i}
-          aria-hidden
-          className="animate-twinkle absolute h-1.5 w-1.5 rounded-full bg-lime-300/70"
-          style={{ top, left, animationDelay: delay }}
-        />
-      ))}
-
-      {/* content */}
+      {/* logo */}
       <div className="relative z-10 flex items-center gap-2.5">
-        <Image
-          src="/gramos-mark.png"
-          alt=""
-          width={442}
-          height={442}
-          className="h-8 w-8"
-          priority
-        />
-        <span className="font-mono text-lg font-semibold tracking-tight text-white">
-          GramOS
-        </span>
+        <Image src="/gramos-mark.png" alt="" width={442} height={442} className="h-8 w-8" priority />
+        <span className="font-mono text-lg font-semibold tracking-tight text-white">GramOS</span>
       </div>
 
-      <div className="relative z-10 max-w-md">
+      {/* headline */}
+      <div className="relative z-10 mt-12 max-w-md">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-lime-400">
           Rural credit risk, explained
         </p>
@@ -373,16 +307,140 @@ function BrandPanel() {
         </p>
       </div>
 
-      <div className="relative z-10 space-y-3 text-xs text-white/40">
-        <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium text-white/55">
-          <span>RTI buyer-payment</span>
-          <span className="text-lime-500">·</span>
-          <span>India-WRIS climate</span>
-          <span className="text-lime-500">·</span>
-          <span>Gemini XAI</span>
-        </p>
-        <p>Built for the Google DeepMind &ldquo;AI for the Planet&rdquo; Accelerator.</p>
+      {/* illustration */}
+      <div className="relative z-10 flex flex-1 items-center justify-center py-6">
+        <AgriScene className="h-auto w-full max-w-sm" />
       </div>
+
+      {/* signal line */}
+      <p className="relative z-10 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-white/55">
+        <span>RTI buyer-payment</span>
+        <span className="text-lime-500">·</span>
+        <span>India-WRIS climate</span>
+        <span className="text-lime-500">·</span>
+        <span>Gemini XAI</span>
+      </p>
     </aside>
+  );
+}
+
+/** Flat agri-fintech vector: a sprout rising from soil next to a coin stack,
+ * traced by a dashed forecast arc. Leaves sway gently; sparkles twinkle. */
+function AgriScene({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 320 300" fill="none" className={className} aria-hidden>
+      <defs>
+        <radialGradient id="agri-glow" cx="50%" cy="55%" r="50%">
+          <stop offset="0%" stopColor="#84cc16" stopOpacity="0.28" />
+          <stop offset="100%" stopColor="#84cc16" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      {/* halo */}
+      <circle cx="168" cy="150" r="124" fill="url(#agri-glow)" />
+      <circle
+        cx="168"
+        cy="150"
+        r="120"
+        stroke="#a3e635"
+        strokeOpacity="0.22"
+        strokeDasharray="2 9"
+      />
+
+      {/* dashed forecast arc rising to the right */}
+      <path
+        d="M150 96 C196 66 244 70 286 34"
+        stroke="#bef264"
+        strokeOpacity="0.7"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeDasharray="3 6"
+      />
+      <circle cx="286" cy="34" r="3.5" fill="#bef264" />
+
+      {/* ground */}
+      <path
+        d="M36 244 C110 224 210 224 284 244 L284 250 C210 276 110 276 36 250 Z"
+        fill="#365314"
+      />
+      <path
+        d="M36 244 C110 224 210 224 284 244"
+        stroke="#4d7c0f"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+
+      {/* coin stack */}
+      <g>
+        <ellipse cx="106" cy="238" rx="30" ry="9" fill="#e9e7cf" stroke="#a3e635" strokeOpacity="0.5" />
+        <ellipse cx="106" cy="228" rx="30" ry="9" fill="#f2f0dc" stroke="#a3e635" strokeOpacity="0.5" />
+        <ellipse cx="106" cy="218" rx="30" ry="9" fill="#faf8ea" stroke="#a3e635" strokeOpacity="0.6" />
+        <text
+          x="106"
+          y="222"
+          textAnchor="middle"
+          fontSize="12"
+          fontWeight="700"
+          fill="#3f6212"
+        >
+          ₹
+        </text>
+      </g>
+
+      {/* sprout — sways from its base */}
+      <g style={{ transformOrigin: "178px 246px" }} className="animate-sway-slow">
+        <path
+          d="M178 246 C176 198 182 158 179 108"
+          stroke="#65a30d"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
+        {/* lower-left leaf */}
+        <path
+          d="M179 172 C150 166 126 178 116 200 C146 210 174 198 179 172 Z"
+          fill="#84cc16"
+        />
+        <path d="M170 187 C150 187 132 194 120 200" stroke="#4d7c0f" strokeOpacity="0.4" strokeWidth="1.5" />
+        {/* lower-right leaf */}
+        <path
+          d="M179 156 C208 146 234 156 246 176 C218 190 188 182 179 156 Z"
+          fill="#a3e635"
+        />
+        <path d="M189 170 C208 168 226 174 238 178" stroke="#4d7c0f" strokeOpacity="0.35" strokeWidth="1.5" />
+        {/* crown leaves */}
+        <path
+          d="M179 108 C168 78 176 46 196 28 C208 56 202 90 179 108 Z"
+          fill="#84cc16"
+        />
+        <path
+          d="M179 116 C192 92 218 78 244 78 C238 108 210 126 179 116 Z"
+          fill="#bef264"
+        />
+      </g>
+
+      {/* seeds */}
+      <circle cx="150" cy="250" r="2" fill="#a3e635" />
+      <circle cx="212" cy="252" r="2" fill="#a3e635" />
+      <circle cx="188" cy="256" r="1.6" fill="#84cc16" />
+
+      {/* sparkles */}
+      {[
+        [64, 70, "0s"],
+        [268, 150, "0.7s"],
+        [96, 150, "1.3s"],
+        [244, 232, "1.9s"],
+      ].map(([x, y, delay], i) => (
+        <path
+          key={i}
+          d={`M${x} ${y - 5} v10 M${x - 5} ${y} h10`}
+          stroke="#a3e635"
+          strokeOpacity="0.6"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          className="animate-twinkle"
+          style={{ animationDelay: delay }}
+        />
+      ))}
+    </svg>
   );
 }

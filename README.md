@@ -4,7 +4,7 @@
 
 GramOS is a B2B risk-intelligence platform for rural micro-enterprise lending. It fuses alternative transaction data with real government ground-observation and satellite-derived climate signals, reasons over all of it with Gemini in a multi-agent pipeline, and gives loan officers an explainable, auditable NPA (non-performing asset) risk score, weeks before a missed payment would otherwise flag it.
 
-Built for the Google DeepMind "AI for the Planet" Accelerator.
+An independent startup project.
 
 ---
 
@@ -106,4 +106,4 @@ All routes except `GET /` require a Supabase-issued bearer token.
 
 ## License
 
-Proprietary, built for the Google DeepMind "AI for the Planet" Accelerator. Not open source; the source is not licensed for redistribution or third-party use.
+Proprietary. Not open source; the source is not licensed for redistribution or third-party use.

@@ -1,6 +1,6 @@
 # GramOS
 
-B2B AI-driven cash flow prediction and risk-flagging system for rural micro enterprises, built for the Google DeepMind "AI for the Planet" Accelerator.
+B2B AI-driven cash flow prediction and risk-flagging system for rural micro enterprises. An independent startup project.
 
 ## Tech Stack
 
