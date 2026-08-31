@@ -2,9 +2,11 @@
 groundwater data, no API key required. Confirmed working 2026-08-08 against
 https://indiawris.gov.in/Dataset/{RainFall,Ground Water Level,...}.
 
-Not imported by the live app yet - see backend/scripts/fetch_wris_climate_data.py for a
-one-off pull, and CLAUDE.md / project history for the plan to eventually replace the
-synthetic rainfall_deviation_pct / soil_moisture_percentage in models.ClimateProfile.
+This client is used offline: backend/scripts/fetch_wris_climate_data.py pulls per-district
+rainfall + groundwater and writes Ref_data/wris_climate_data.json, which main.py loads at
+startup and attaches to each assess-risk request as `wris_climate` (see engine.py's
+analyze_wris_climate node and the groundwater term in calculate_base_score). The live app
+does not call this module at request time.
 
 Gotcha: this API's district naming is NOT consistently pre- or post-2024-renaming -
 confirmed by live query on 2026-08-08: Belagavi only returns data under the legacy name
