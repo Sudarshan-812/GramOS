@@ -34,7 +34,7 @@ export default function Navbar() {
       >
         <a href="#top" className="flex cursor-pointer items-center gap-2">
           <Image
-            src="/GramOStpt.png"
+            src="/gramos-logo.png"
             alt="GramOS"
             width={1024}
             height={1024}

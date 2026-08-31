@@ -299,7 +299,7 @@ export default function RiskDashboard() {
         <div className="border-b border-black/10 px-5 py-4">
           <div className="flex items-center gap-2">
             <Image
-              src="/GramOStpt.png"
+              src="/gramos-logo.png"
               alt="GramOS"
               width={1024}
               height={1024}

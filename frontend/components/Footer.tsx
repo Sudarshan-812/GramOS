@@ -14,7 +14,7 @@ export default function Footer() {
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <a href="#top" className="flex cursor-pointer items-center gap-2">
             <Image
-              src="/GramOStpt.png"
+              src="/gramos-logo.png"
               alt="GramOS"
               width={1024}
               height={1024}
