@@ -486,12 +486,12 @@ function AgriScene({ className }: { className?: string }) {
       <circle cx="188" cy="256" r="1.6" fill="#84cc16" />
 
       {/* sparkles */}
-      {[
+      {([
         [64, 70, "0s"],
         [268, 150, "0.7s"],
         [96, 150, "1.3s"],
         [244, 232, "1.9s"],
-      ].map(([x, y, delay], i) => (
+      ] as [number, number, string][]).map(([x, y, delay], i) => (
         <path
           key={i}
           d={`M${x} ${y - 5} v10 M${x - 5} ${y} h10`}
