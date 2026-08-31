@@ -20,3 +20,6 @@ Thumbs.db
 # Reference data (not part of the app)
 des_Ref/
 Ref_data/
+
+# Local bug-report screenshots
+issues/

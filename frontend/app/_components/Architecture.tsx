@@ -41,55 +41,47 @@ export default function Architecture() {
           </p>
         </Reveal>
 
-        <div className="mt-12 grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <Reveal className="mt-12 grid grid-cols-1 items-stretch gap-5 lg:grid-cols-2">
           {/* Legacy */}
-          <Reveal>
-            <div className="rounded-2xl border border-black/10 bg-white p-8 shadow-sm transition hover:shadow-md">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mist">
-                  <Landmark className="h-4 w-4 text-onyx/40" />
-                </div>
-                <h3 className="text-sm font-medium uppercase tracking-widest text-onyx/40">
-                  Legacy Scoring
-                </h3>
+          <div className="h-full rounded-2xl border border-black/10 bg-white p-8 shadow-sm transition hover:shadow-md">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mist">
+                <Landmark className="h-4 w-4 text-onyx/40" />
               </div>
-              <ul className="mt-6 space-y-4">
-                {legacyPoints.map((point) => (
-                  <li key={point} className="flex items-start gap-3">
-                    <FileWarning className="mt-1 h-3.5 w-3.5 shrink-0 text-onyx/30" />
-                    <span className="text-sm leading-6 text-onyx/60">
-                      {point}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <h3 className="text-sm font-medium uppercase tracking-widest text-onyx/40">
+                Legacy Scoring
+              </h3>
             </div>
-          </Reveal>
+            <ul className="mt-6 space-y-4">
+              {legacyPoints.map((point) => (
+                <li key={point} className="flex items-start gap-3">
+                  <FileWarning className="mt-1 h-3.5 w-3.5 shrink-0 text-onyx/30" />
+                  <span className="text-sm leading-6 text-onyx/60">{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           {/* GramOS */}
-          <Reveal delay={100}>
-            <div className="rounded-2xl border border-lime-400/50 bg-white p-8 shadow-sm transition hover:shadow-md">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-lime-100">
-                  <Database className="h-4 w-4 text-lime-700" />
-                </div>
-                <h3 className="text-sm font-medium uppercase tracking-widest text-lime-700">
-                  GramOS
-                </h3>
+          <div className="h-full rounded-2xl border border-lime-400/50 bg-white p-8 shadow-sm transition hover:shadow-md">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-lime-100">
+                <Database className="h-4 w-4 text-lime-700" />
               </div>
-              <ul className="mt-6 space-y-4">
-                {gramosPoints.map((point) => (
-                  <li key={point} className="flex items-start gap-3">
-                    <CheckCircle2 className="mt-1 h-3.5 w-3.5 shrink-0 text-lime-600" />
-                    <span className="text-sm leading-6 text-onyx/80">
-                      {point}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+              <h3 className="text-sm font-medium uppercase tracking-widest text-lime-700">
+                GramOS
+              </h3>
             </div>
-          </Reveal>
-        </div>
+            <ul className="mt-6 space-y-4">
+              {gramosPoints.map((point) => (
+                <li key={point} className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-1 h-3.5 w-3.5 shrink-0 text-lime-600" />
+                  <span className="text-sm leading-6 text-onyx/80">{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Reveal>
 
         {/* Pipeline strip */}
         <Reveal delay={200}>

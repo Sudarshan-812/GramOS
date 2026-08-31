@@ -35,23 +35,20 @@ export default function Features() {
           </p>
         </Reveal>
 
-        <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map(({ icon: Icon, title, description }, i) => (
-            <Reveal key={title} delay={i * 80}>
-              <div className="group rounded-2xl border border-black/10 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-lime-100 transition duration-300 group-hover:bg-lime-300">
-                  <Icon className="h-5 w-5 text-lime-700" />
-                </div>
-                <h3 className="mt-6 text-base font-semibold text-onyx">
-                  {title}
-                </h3>
-                <p className="mt-3 text-sm leading-6 text-onyx/60">
-                  {description}
-                </p>
+        <Reveal className="mt-12 grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map(({ icon: Icon, title, description }) => (
+            <div
+              key={title}
+              className="group flex h-full flex-col rounded-2xl border border-black/10 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-lime-100 transition duration-300 group-hover:bg-lime-300">
+                <Icon className="h-5 w-5 text-lime-700" />
               </div>
-            </Reveal>
+              <h3 className="mt-6 text-base font-semibold text-onyx">{title}</h3>
+              <p className="mt-3 text-sm leading-6 text-onyx/60">{description}</p>
+            </div>
           ))}
-        </div>
+        </Reveal>
       </div>
     </section>
   );
