@@ -34,14 +34,14 @@ export default function Navbar() {
       >
         <a href="#top" className="flex cursor-pointer items-center gap-2">
           <Image
-            src="/GramOStpt.png"
+            src="/gramos-mark.png"
             alt="GramOS"
-            width={1024}
-            height={1024}
+            width={442}
+            height={442}
             className="h-6 w-6"
             priority
           />
-          <span className="text-sm font-semibold tracking-tight text-onyx">
+          <span className="font-mono text-sm font-semibold tracking-tight text-onyx">
             GramOS
           </span>
         </a>

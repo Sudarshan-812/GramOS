@@ -299,13 +299,13 @@ export default function RiskDashboard() {
         <div className="border-b border-black/10 px-5 py-4">
           <div className="flex items-center gap-2">
             <Image
-              src="/GramOStpt.png"
+              src="/gramos-mark.png"
               alt="GramOS"
-              width={1024}
-              height={1024}
+              width={442}
+              height={442}
               className="h-6 w-6"
             />
-            <h1 className="text-xl font-semibold tracking-tight text-onyx">
+            <h1 className="font-mono text-xl font-semibold tracking-tight text-onyx">
               GramOS
             </h1>
           </div>

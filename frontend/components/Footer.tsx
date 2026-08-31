@@ -14,13 +14,13 @@ export default function Footer() {
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <a href="#top" className="flex cursor-pointer items-center gap-2">
             <Image
-              src="/GramOStpt.png"
+              src="/gramos-mark.png"
               alt="GramOS"
-              width={1024}
-              height={1024}
+              width={442}
+              height={442}
               className="h-5 w-5"
             />
-            <span className="font-semibold text-onyx/80">GramOS</span>
+            <span className="font-mono font-semibold text-onyx/80">GramOS</span>
           </a>
           <nav className="flex items-center gap-6 text-sm text-onyx/50">
             {FOOTER_LINKS.map(({ href, label }) => (
