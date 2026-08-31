@@ -426,7 +426,7 @@ export default function RiskDashboard() {
                 type="button"
                 onClick={handleSimulate}
                 disabled={assessing}
-                className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-lime-300 px-5 py-2.5 text-sm font-semibold text-onyx shadow-sm transition hover:-translate-y-0.5 hover:bg-lime-200 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-lime-300 px-5 py-2.5 text-sm font-semibold text-onyx shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-lime-200 hover:shadow-md active:translate-y-0 active:shadow-sm disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
               >
                 {assessing ? (
                   <>

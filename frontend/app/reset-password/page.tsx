@@ -62,7 +62,7 @@ export default function ResetPasswordPage() {
             <button
               type="button"
               onClick={() => router.push("/login")}
-              className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-lime-300 px-4 py-2.5 text-sm font-semibold text-onyx shadow-sm transition hover:bg-lime-200"
+              className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-lime-300 px-4 py-2.5 text-sm font-semibold text-onyx shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-lime-200 hover:shadow-md active:translate-y-0 active:shadow-sm"
             >
               Back to sign in
             </button>
@@ -106,7 +106,7 @@ export default function ResetPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-lime-300 px-4 py-2.5 text-sm font-semibold text-onyx shadow-sm transition hover:bg-lime-200 disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-md bg-lime-300 px-4 py-2.5 text-sm font-semibold text-onyx shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-lime-200 hover:shadow-md active:translate-y-0 active:shadow-sm disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-sm"
               >
                 {loading ? (
                   <>

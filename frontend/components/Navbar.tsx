@@ -67,7 +67,7 @@ export default function Navbar() {
           </Link>
           <a
             href="/dashboard"
-            className="inline-flex cursor-pointer items-center gap-1 rounded-full bg-lime-300 px-4 py-1.5 text-sm font-semibold text-onyx transition hover:bg-lime-200"
+            className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-lime-300 px-4 py-1.5 text-sm font-semibold text-onyx shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-lime-200 hover:shadow-md active:translate-y-0 active:shadow-sm"
           >
             Dashboard
           </a>
