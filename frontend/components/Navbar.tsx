@@ -6,8 +6,8 @@ import Link from "next/link";
 import { X } from "@/components/icons/MaterialIcons";
 
 const NAV_LINKS = [
-  { href: "#architecture", label: "Architecture" },
-  { href: "#features", label: "Platform" },
+  { href: "/#findings", label: "Findings" },
+  { href: "/#sources", label: "Data sources" },
 ];
 
 export default function Navbar() {
@@ -71,7 +71,7 @@ export default function Navbar() {
             href="/dashboard"
             className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-lime-300 px-3.5 py-1.5 text-sm font-semibold text-onyx shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-lime-200 hover:shadow-md active:translate-y-0 active:shadow-sm sm:px-4"
           >
-            Dashboard
+            Prototype
           </a>
 
           <button

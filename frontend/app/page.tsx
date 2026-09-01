@@ -1,12 +1,13 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
-import Architecture from "./_components/Architecture";
 import Chakra from "./_components/Chakra";
-
-import CTA from "./_components/CTA";
-import Features from "./_components/Features";
+import DataSources from "./_components/DataSources";
+import Findings from "./_components/Findings";
 import Flora from "./_components/Flora";
 import Hero from "./_components/Hero";
+import Hypothesis from "./_components/Hypothesis";
+import IncomeGap from "./_components/IncomeGap";
+import Limitations from "./_components/Limitations";
 
 export default function Home() {
   return (
@@ -17,9 +18,11 @@ export default function Home() {
 
       <main className="relative z-10 flex-1">
         <Hero />
-        <Architecture />
-        <Features />
-        <CTA />
+        <Hypothesis />
+        <Findings />
+        <IncomeGap />
+        <DataSources />
+        <Limitations />
       </main>
 
       <Footer />
