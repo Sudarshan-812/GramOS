@@ -36,7 +36,10 @@ export default function Footer() {
         </div>
         <div className="flex flex-col items-center justify-between gap-2 border-t border-black/5 pt-6 text-sm text-onyx/50 sm:flex-row">
           <span>© {new Date().getFullYear()} GramOS. All rights reserved.</span>
-          <span>Powered by Gemini &amp; Google AlphaEarth</span>
+          <span>
+            Research project by Sudarshan Kulkarni. Data: Karnataka Cane
+            Commissionerate (RTI), India-WRIS.
+          </span>
         </div>
       </div>
     </footer>
