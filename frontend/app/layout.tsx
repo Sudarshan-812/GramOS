@@ -12,10 +12,24 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const TITLE = "GramOS - What mill payment data says about rural credit risk";
+const DESCRIPTION =
+  "I filed an RTI for Karnataka sugar mill payment records to test whether mill arrears predict farmer default. The data said no. It said something more interesting instead.";
+
 export const metadata: Metadata = {
-  title: "GramOS | AI Operating System for Rural Financial Intelligence",
-  description:
-    "Predict NPA risk before it happens using climate satellite data and alternative transaction logs.",
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    type: "website",
+    siteName: "GramOS",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
