@@ -15,16 +15,16 @@ export default function Hero() {
         </span>
 
         <h1
-          className="animate-rise mt-6 max-w-2xl text-balance text-4xl font-normal leading-[1.2] tracking-[-0.03em] text-onyx sm:text-5xl sm:leading-[1.15]"
+          className="animate-rise mt-6 max-w-2xl text-balance text-[1.75rem] font-normal leading-snug tracking-[-0.03em] text-onyx sm:text-5xl sm:leading-[1.15]"
           style={{ animationDelay: "0.08s" }}
         >
           The AI Operating System for{" "}
-          <span className="relative inline-block whitespace-nowrap">
+          <span className="relative inline whitespace-normal sm:inline-block sm:whitespace-nowrap">
             <svg
               aria-hidden
               viewBox="-8 0 320 46"
               preserveAspectRatio="none"
-              className="animate-paint-stroke absolute -inset-x-3 inset-y-0 h-full w-[calc(100%+1.5rem)] origin-left"
+              className="animate-paint-stroke absolute -inset-x-3 inset-y-0 hidden h-full w-[calc(100%+1.5rem)] origin-left sm:block"
             >
               {/* under-layer, offset slightly for two-tone brush depth */}
               <path
@@ -68,7 +68,7 @@ export default function Hero() {
               <circle cx="287" cy="21" r="1" fill="#bef264" opacity="0.4" />
               <circle cx="298" cy="26" r="1.1" fill="#84cc16" opacity="0.35" />
             </svg>
-            <span className="relative z-10 px-2 py-0.5">
+            <span className="relative z-10 box-decoration-clone rounded-md bg-lime-200/70 px-1.5 py-0.5 sm:bg-transparent sm:px-2">
               Rural Financial Intelligence
             </span>
           </span>
@@ -104,7 +104,7 @@ export default function Hero() {
 
         {/* Stat cards */}
         <dl
-          className="animate-rise mt-16 grid w-full grid-cols-3 gap-3 sm:gap-4"
+          className="animate-rise mt-16 grid w-full grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4"
           style={{ animationDelay: "0.32s" }}
         >
           {stats.map(({ value, label }) => (

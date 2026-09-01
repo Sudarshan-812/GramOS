@@ -23,3 +23,6 @@ Ref_data/
 
 # Local bug-report screenshots
 issues/
+
+# Local status notes (not part of the app)
+Pending.md

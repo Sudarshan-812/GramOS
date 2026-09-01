@@ -22,7 +22,7 @@ export default function Footer() {
             />
             <span className="font-mono font-semibold text-onyx/80">GramOS</span>
           </a>
-          <nav className="flex items-center gap-6 text-sm text-onyx/50">
+          <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-onyx/50">
             {FOOTER_LINKS.map(({ href, label }) => (
               <Link
                 key={href}
