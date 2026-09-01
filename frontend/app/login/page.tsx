@@ -101,7 +101,7 @@ export default function LoginPage() {
           </h1>
           <p className="mt-2 text-sm leading-6 text-onyx/55">
             {isSignIn
-              ? "Sign in to the risk dashboard for your portfolio."
+              ? "Sign in to the risk dashboard."
               : resetSent
                 ? "Check your email for a link to reset your password."
                 : "Enter your account email and we’ll send you a reset link."}
