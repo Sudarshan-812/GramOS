@@ -26,3 +26,6 @@ issues/
 
 # Local status notes (not part of the app)
 Pending.md
+
+# Internal decks / manuals must never be served publicly by Next.js
+frontend/public/*.pdf
